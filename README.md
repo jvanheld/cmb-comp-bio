@@ -1,37 +1,10 @@
-## Welcome to GitHub Pages
+## Computational Biology
 
-You can use the [editor on GitHub](https://github.com/jvanheld/cmb-comp-bio/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+This site contains the teaching material for the course [**Computational Biology**](https://formations.univ-amu.fr/ME5SIN-S51IN1Z4-en.html) taught in the 1st year of the Master [*Computational and Mathematical Biology*](https://formations.univ-amu.fr/ME5SBI-PRSBI5AA-en.html) at [Aix-Marseille Université](https://www.univ-amu.fr/). 
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Teachers
 
-### Markdown
+1. Laurent Pezard
+2. Michael Kopp
+3. Jacques van Helden
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/jvanheld/cmb-comp-bio/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
