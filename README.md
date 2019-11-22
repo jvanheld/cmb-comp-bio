@@ -16,3 +16,16 @@ This site contains the teaching material for the course [**Computational Biology
 2. Michael Kopp
 3. Jacques van Helden
 
+### Tentative program (Jacques van Helden)
+
+| Session | Topics | Type | Teaching material |
+|--------|-----------------|-------------|-------------------------------|
+| 1 | Introduction                           | Course    | |
+|   | Sequence search by similarity          | Course     |  |
+|   |                                        | Practical  |  |
+| 2 | Hidden Markov models                   | Course     |  |
+|   | Segmenting genomic sequences with HMMs | Practical  |  |
+| 3 | Protein domains                        | Course     |  |
+|   | Detecting protein domains with HMMs    | Practical  |  |
+
+
