@@ -5,7 +5,7 @@ This site contains the teaching material for the course [**Computational Biology
 ### Links
 
 | Doc | URL | 
-| | |
+|-------------------|------------------------------------------|
 | Github repo | |
 | Git pages | <https://jvanheld.github.io/cmb-comp-bio/> |
 | [19-20] Computational Biology on Ametice | <https://ametice.univ-amu.fr/course/view.php?id=51934> |
