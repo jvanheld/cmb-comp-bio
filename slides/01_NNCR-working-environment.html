@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Jacques van Helden" />
+  <meta name="date" content="2019-11-24" />
+  <title>Infrastructure and software environment</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <script src="01_NNCR-working-environment_files/jquery-1.11.3/jquery.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="01_NNCR-working-environment_files/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+  <script src="01_NNCR-working-environment_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+  <script src="01_NNCR-working-environment_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+  <script src="01_NNCR-working-environment_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+  <link href="01_NNCR-working-environment_files/slidy-2/styles/slidy.css" rel="stylesheet" />
+  <script src="01_NNCR-working-environment_files/slidy-2/scripts/slidy.js"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Infrastructure and software environment</h1>
+  <h1 class="subtitle">IFB National Network of Computing Resources</h1>
+  <p class="author">
+Jacques van Helden
+  </p>
+  <p class="date">2019-11-24</p>
+</div>
+<div id="command-line-tools-in-bioinformatics" class="slide section level2">
+<h1>Command-line tools in bioinformatics</h1>
+<ul>
+<li><p>A large proportion of bioinformatics tools are available only on the command line. Moreover, even for tools equipped with a graphical user interface (e.g. BLAST, clustal, …) the use of command-line can be necessary for some projects</p></li>
+<li><p>Enables to automate the tasks</p>
+<ul>
+<li>Managing repetitive processes: apply the same task to numerous data files or with many different options</li>
+<li>Managing complex processes combining many tasks (workflows)</li>
+</ul></li>
+<li><p>High performance computing (HPC)</p>
+<ul>
+<li>running tasks that require huge resources of computing and storage</li>
+</ul></li>
+<li><p>Traceability, reproducibility, reusability</p>
+<ul>
+<li>traceability: keeping track of each step and parameter used to produce a result</li>
+<li>reproducuibility; enabling to re-run the analysis and reproduce the same results</li>
+<li>reusability: enabling to run the same analysis with different data</li>
+</ul></li>
+</ul>
+</div>
+<div id="working-environments" class="slide section level2">
+<h1>Working environments</h1>
+<p>Most bioinformatics tools can be installed on Unix-like operating systems (Linux, Mac OS X), and can be used in different environments.</p>
+<ul>
+<li>Terminal of your own computer (Linux, Mac OS X)</li>
+<li>Virtual Machine (e.g. <a href="https://www.virtualbox.org/">VirtualBox</a>, <a href="https://www.vmware.com/">VWMare</a>)</li>
+<li>Containers (<a href="https://www.docker.com/">Docker</a>, <a href="https://www.sylabs.io/singularity/">singularity</a>)</li>
+<li>Terminal of a remote computer (via an <code>ssh</code> connection)</li>
+<li>Bureau Virtuel</li>
+</ul>
+</div>
+<div id="virtual-machines" class="slide section level2">
+<h1>Virtual machines</h1>
+<ul>
+<li><p>Components</p>
+<ul>
+<li>host: can be your own computer (note: also used to deploy services on HPC computers)</li>
+<li>host operating system (Linux, Mac, Windows)</li>
+<li>virtual machine (VM) : emulation of an other computer, that runs on the host machine</li>
+<li>operating system of the VM: Linux, Windows, …</li>
+<li>hypervisor (= monitor): software that runs the virtual machines on the host</li>
+</ul></li>
+<li><p>Typical applications</p>
+<ul>
+<li>run a Linux OS on a Windows or Macintosh PC</li>
+<li>test a software under different operating systems</li>
+<li>isolate a service from the host system (security, resource segmentation)</li>
+</ul></li>
+<li><p>Examples of hypervisors</p>
+<ul>
+<li>VirtualBox (<a href="https://www.virtualbox.org/" class="uri">https://www.virtualbox.org/</a>)</li>
+<li>VWMare (<a href="https://www.vmware.com/" class="uri">https://www.vmware.com/</a>)</li>
+</ul></li>
+</ul>
+</div>
+<div id="container-based-virtualisation" class="slide section level2">
+<h1>Container-based virtualisation</h1>
+<ul>
+<li><p>Applications run on a shared operating system without requiring a virtual machine</p></li>
+<li><p>Advantages</p>
+<ul>
+<li>modular combination of applications and libraries (“à la carte”)</li>
+<li>less resource-consuming than virtual machines</li>
+</ul></li>
+<li><p>Container management software</p>
+<ul>
+<li>Docker (<a href="https://www.docker.com/" class="uri">https://www.docker.com/</a>)</li>
+<li>singularity (<a href="https://www.sylabs.io/singularity/" class="uri">https://www.sylabs.io/singularity/</a>)</li>
+</ul></li>
+</ul>
+</div>
+<div id="virtual-machines-versus-containers" class="slide section level2">
+<h1>Virtual machines versus containers</h1>
+<div class="figure" style="text-align: center">
+<img src="images/vm_vs_container.png" alt="**Comparaison of virtualisation solutions.** Right: Virtual Machine; Center: Docker container; right: Singularity container. Source: Greg Kurtzer keynote at HPC Advisory Council 2017 @ Stanford" width="90%" />
+<p class="caption">
+<strong>Comparaison of virtualisation solutions.</strong> Right: Virtual Machine; Center: Docker container; right: Singularity container. Source: Greg Kurtzer keynote at HPC Advisory Council 2017 @ Stanford
+</p>
+</div>
+</div>
+<div id="installation-of-software-tools-in-the-local-operating-system" class="slide section level2">
+<h1>Installation of software tools in the local operating system</h1>
+<ul>
+<li><p>Advantages</p>
+<ul>
+<li>Immediate availability of the tools</li>
+<li>Direct invocation by the native operating system (more efficient)</li>
+</ul></li>
+<li><p>Weaknesses</p>
+<ul>
+<li>Dependences (system libraries, language libraries, other executables)</li>
+<li>Incompatibilities between dependences of different tools</li>
+<li>The installation of some tools and libraries requires admin rights</li>
+<li>OS-dependency of package managers (<a href="https://en.wikipedia.org/wiki/Package_manager">package managers</a>): apt-get, yum, ports, brew, …</li>
+<li>Some applications and libraries are available only on some package managers.</li>
+</ul></li>
+</ul>
+</div>
+<div id="conda-packages" class="slide section level2">
+<h1>Conda packages</h1>
+<ul>
+<li><p>Doc : <a href="https://conda.io/docs/" class="uri">https://conda.io/docs/</a></p></li>
+<li><p>Advantages</p>
+<ul>
+<li>A multi-platform package manager (Linux, Mac OS X, Windows)</li>
+<li>All the installations can be done at the user-level (no need to be admin)</li>
+<li>Community project supported by a large community (computer scientists, statisticians, bioinformaticians, …) <span class="math inline">\(\rightarrow\)</span> ever-increasing number of supported tools an libraries</li>
+<li>Continuous integration <span class="math inline">\(\rightarrow\)</span> very fast response to requests</li>
+<li>Very precise management of the dependencies and version</li>
+<li>Seamingless management of uninstallation for no more required software</li>
+<li>Trying it is adopting it!</li>
+</ul></li>
+<li><p>Weaknesses</p>
+<ul>
+<li>If each used installs each tool and dependencies in her/his own account, this creates redundancy and waste of storage space.</li>
+</ul></li>
+</ul>
+</div>
+<div id="computer-cluster" class="slide section level2">
+<h1>Computer cluster</h1>
+<p>A cluster is a set of computers (denotes as <strong>nodes</strong>) that work together and can be seen as a single system. Clusters are generally used to run parallel computing</p>
+<div class="figure" style="text-align: center">
+<img src="images/600px-IBM_Blue_Gene_P_supercomputer.jpg" alt="**Grappe de serveurs.** En avant-plan: *Homo sapiens* tentant d'établir une interaction physique avec les machines.  Source: &lt;https://en.wikipedia.org/wiki/Parallel_computing&gt;" width="60%" />
+<p class="caption">
+<strong>Grappe de serveurs.</strong> En avant-plan: <em>Homo sapiens</em> tentant d’établir une interaction physique avec les machines. Source: <a href="https://en.wikipedia.org/wiki/Parallel_computing" class="uri">https://en.wikipedia.org/wiki/Parallel_computing</a>
+</p>
+</div>
+</div>
+<div id="parallel-computing" class="slide section level2">
+<h1>Parallel computing</h1>
+<p>Parallel computing consists in running simultaneously a series of processes on a computer system.</p>
+<p>Tasks can be distributed on several Computer Processing Units (<strong>CPUs</strong>) of a same computer and/or on several computers (cluster).</p>
+<p>The distribution of tasks on nodes and CPUs relies on a <strong>job scheduler</strong>. Users submit jobs (in the form of command lines or scripts) to the scheduler, which manages their execution on the different nodes and CPUs.</p>
+</div>
+
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+</body>
+</html>
