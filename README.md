@@ -29,33 +29,25 @@ Note: The first course (sequence similarity search) partly overlaps with the int
 1. The practical will rely on a command-line use of the BLAST algorithm, with options specifically tuned to collect a family of proteins from the full proteome of an organism of interest.
 2. The practical will also introduce the way to run the analyses on a computer cluster (IFB core cluster), by sending them to a job scheduler (slurm). 
 
-| Session | Topics | Type | Teaching material |
+| Session | Date | Topics | Type | Teaching material |
 |--------|----------------------------------|-------------|--------------|
-| 1 | ¨**Using the IFB NNCR cluster infrastructure** |
-|   | Introduction                            | Course     | Slides [[html](slides/01_NNCR-working-environment.html)] [[Rmd](slides/01_NNCR-working-environment.Rmd)] |
-|   | IFB high performance computing usage | Practical | Slides [[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html)] |
-| | First steps with the IFB HPC cluster | Practical | - [IFB cluster doc](https://ifb-elixirfr.gitlab.io/cluster/doc/)<br>- [Quick start](https://ifb-elixirfr.gitlab.io/cluster/doc/quick-start/) <br>- [Slurm user guide](https://ifb-elixirfr.gitlab.io/cluster/doc/slurm_user_guide/) |
-| 2  | **Collecting sequence families by sequence alignement**      |
-|   | Sequence search by similarity      | Course     |  |
-|   | Collecting sequence families with BLAST | Practical  |  |
-| 3 | **Segmenting sequences with HMMs** |
-|   | Hidden Markov models                    | Course     |  |
-|   | Annotating CpG islands with HMMs        | Practical  |  |
-| 4 | **Detecting protein domains with HMMs** |
-|   | Protein domains                         | Course     |  |
-|   | Detecting protein domains with HMMs     | Practical  |  |
+| 1 | 2019-11-25 | ¨**Using the IFB NNCR cluster infrastructure** |
+| | | Introduction                            | Course     | Slides [[html](slides/01_NNCR-working-environment.html)] [[Rmd](slides/01_NNCR-working-environment.Rmd)] |
+| | | IFB high performance computing usage | Practical | Slides [[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html)] |
+| | | First steps with the IFB HPC cluster | Practical | - [IFB cluster doc](https://ifb-elixirfr.gitlab.io/cluster/doc/)<br>- [Quick start](https://ifb-elixirfr.gitlab.io/cluster/doc/quick-start/) <br>- [Slurm user guide](https://ifb-elixirfr.gitlab.io/cluster/doc/slurm_user_guide/) |
+| 2  | 2019-11-25 | **Collecting sequence families by sequence alignement**      |
+| | | Sequence search by similarity      | Course     |  |
+| | | Collecting sequence families with BLAST | Practical  | [[html](practicals/blast_proteome/blast_protein-family.html)][[Rmd](practicals/blast_proteome/blast_protein-family.Rmd)] |
+| 3 | 2019-11-29 | **Segmenting sequences with HMMs** |
+| | | Hidden Markov models                    | Course     |  |
+| |  | Annotating CpG islands with HMMs        | Practical  |  |
+| 4 | 2019-12-05 | **Detecting protein domains with HMMs** |
+| | | Protein domains                         | Course     |  |
+| | | Detecting protein domains with HMMs     | Practical  |  |
 
 
 
-## Bioinformatics resources used for this course
-
-| Resource | Description | URL | 
-|-------|----------------------------------|-------------------|
-| **Ensembl** | Genome database | [www.ensembl.org](http://www.ensembl.org/) |
-| **UniprotKB** | Knowledge base of protein sequence and functional information | [www.uniprot.org](https://www.uniprot.org/) | 
-| **PFAM** | Database of protein families | [pfam.xfam.org](https://pfam.xfam.org/) |
-
-### IFB computing infrastructure
+## IFB computing infrastructure
 
 For the practicals, we will use the IFB core cluster, which currently contains 4300 cores adn 400TB storage. 
 
@@ -68,4 +60,12 @@ For the practicals, we will use the IFB core cluster, which currently contains 4
 | Slides: IFB high performance computing usage |  https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html#1 |
 | IFB cluster doc | https://ifb-elixirfr.gitlab.io/cluster/doc/<br>- [Quick start](https://ifb-elixirfr.gitlab.io/cluster/doc/quick-start/) <br>- [Slurm user guide](https://ifb-elixirfr.gitlab.io/cluster/doc/slurm_user_guide/) | 
 
+
+## Bioinformatics resources used for this course
+
+| Resource | Description | URL | 
+|-------|----------------------------------|-------------------|
+| **Ensembl** | Genome database | [www.ensembl.org](http://www.ensembl.org/) |
+| **UniprotKB** | Knowledge base of protein sequence and functional information | [www.uniprot.org](https://www.uniprot.org/) | 
+| **PFAM** | Database of protein families | [pfam.xfam.org](https://pfam.xfam.org/) |
 
