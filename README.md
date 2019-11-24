@@ -22,21 +22,50 @@ This site contains the teaching material for the course [**Computational Biology
 - Biological and mathematical concepts will thus be introduced progressively. 
 - For the practicals, students will be encouraged to form interdisciplinary teams (1 biologist + 1 mathematician) in order to combine their respective skills. 
 
-### Tentative program (Jacques van Helden)
+### Sequence analysis (Jacques van Helden)
 
-The first session (sequence similarity search) partly overlaps with the introductory courses of bioinformatics taught in Life Science Bachelor programs. However, the practical will go a bit further than what has been taught in bachelor. 
+Note: The first course (sequence similarity search) partly overlaps with the introductory courses of bioinformatics taught in Life Science Bachelor programs. However, the practical will go a bit further than what has been taught in bachelor. 
 
 1. The practical will rely on a command-line use of the BLAST algorithm, with options specifically tuned to collect a family of proteins from the full proteome of an organism of interest.
 2. The practical will also introduce the way to run the analyses on a computer cluster (IFB core cluster), by sending them to a job scheduler (slurm). 
 
 | Session | Topics | Type | Teaching material |
-|--------|-----------------|-------------|-------------------------------|
-| 1 | Introduction                            | Course     |  |
-|   | Sequence search by similarity           | Course     |  |
+|--------|----------------------------------|-------------|--------------|
+| 1 | ¨**Using the IFB NNCR cluster infrastructure** |
+|   | Introduction                            | Course     | Slides [[html](slides/01_NNCR-working-environment.html)] [[Rmd](slides/01_NNCR-working-environment.Rmd)] |
+|   | IFB high performance computing usage | Practical | Slides [[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html)] |
+| | First steps with the IFB HPC cluster | Practical | - [IFB cluster doc](https://ifb-elixirfr.gitlab.io/cluster/doc/)<br>- [Quick start](https://ifb-elixirfr.gitlab.io/cluster/doc/quick-start/) <br>- [Slurm user guide](https://ifb-elixirfr.gitlab.io/cluster/doc/slurm_user_guide/) |
+| 2  | **Collecting sequence families by sequence alignement**      |
+|   | Sequence search by similarity      | Course     |  |
 |   | Collecting sequence families with BLAST | Practical  |  |
-| 2 | Hidden Markov models                    | Course     |  |
+| 3 | **Segmenting sequences with HMMs** |
+|   | Hidden Markov models                    | Course     |  |
 |   | Annotating CpG islands with HMMs        | Practical  |  |
-| 3 | Protein domains                         | Course     |  |
+| 4 | **Detecting protein domains with HMMs** |
+|   | Protein domains                         | Course     |  |
 |   | Detecting protein domains with HMMs     | Practical  |  |
+
+
+
+## Bioinformatics resources used for this course
+
+| Resource | Description | URL | 
+|-------|----------------------------------|-------------------|
+| **Ensembl** | Genome database | [www.ensembl.org](http://www.ensembl.org/) |
+| **UniprotKB** | Knowledge base of protein sequence and functional information | [www.uniprot.org](https://www.uniprot.org/) | 
+| **PFAM** | Database of protein families | [pfam.xfam.org](https://pfam.xfam.org/) |
+
+### IFB computing infrastructure
+
+For the practicals, we will use the IFB core cluster, which currently contains 4300 cores adn 400TB storage. 
+
+**Attention**: all tasks must **imperatively** run via the `slurm` task scheduler (never run them on the login node). 
+
+
+| Resource | URL | 
+|------------------------|----------------------------------|
+| IFB NNCR cluster: info + account request | https://www.france-bioinformatique.fr/en/cluster |
+| Slides: IFB high performance computing usage |  https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html#1 |
+| IFB cluster doc | https://ifb-elixirfr.gitlab.io/cluster/doc/<br>- [Quick start](https://ifb-elixirfr.gitlab.io/cluster/doc/quick-start/) <br>- [Slurm user guide](https://ifb-elixirfr.gitlab.io/cluster/doc/slurm_user_guide/) | 
 
 
