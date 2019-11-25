@@ -345,14 +345,14 @@ div.tocify {
 
 <h1 class="title toc-ignore">Using BLAST on the command line</h1>
 <h4 class="author">Jacques van Helden</h4>
-<h4 class="date">Created: 8/10/2018; last update: 2019-11-24</h4>
+<h4 class="date">Created: 8/10/2018; last update: 2019-11-25</h4>
 
 </div>
 
 
 <hr />
-<div id="goals-of-this-tutorial" class="section level2">
-<h2>Goals of this tutorial</h2>
+<div id="goals-of-this-tutorial" class="section level1">
+<h1>Goals of this tutorial</h1>
 <p>In this tutorial, we will use the local sequence similarity search tool (BLAST) to searching sequence similarities for a protein of interest (an histone) in the proteome of a given organism (the yeast Saccharomyces cerevisiae).</p>
 <p>This approach is very simple, fast and widely used (BLAST is the most highly bioinformatics tool worldwide), but suffers from some limitations. In particular, the resulting list of protein sequences is sensitive to the particular protein chosse as query.</p>
 <p>In a next practical, we will rely on a more powerful method based on Hidden Markov Models (HMM) in order to build a profile for a protein family, and use this profile to scan the proteome and detect all the members of this family.</p>
@@ -360,8 +360,18 @@ div.tocify {
 <p>We will also perform some exercise to evaluate the impact of some parameters on the results (in particular, the threshold on the e-value).</p>
 <hr />
 </div>
-<div id="prerequisite" class="section level2">
-<h2>Prerequisite</h2>
+<div id="operations" class="section level1">
+<h1>Operations</h1>
+<p>We will successively perform the following operations.</p>
+<ol style="list-style-type: decimal">
+<li><p>Select the full set of proteins (proteome) identified by translating the putatively coding regions of a given organism (e.g. the fruit fly <em>Drosophila melanogaster</em>), download its sequences to our computer, and upload these sequences to the High-Performance Computing server (the IFB core cluster).</p></li>
+<li><p>Download a sequence of interest (e.g. Histone H3) on the HPC server.</p></li>
+<li><p>Use the similarity search tool <code>blast</code> to find homologs of the protein of interest in the selected genome.</p></li>
+</ol>
+<hr />
+</div>
+<div id="prerequisite" class="section level1">
+<h1>Prerequisite</h1>
 <p>This practical assumes that you are connected to a cluster of the IFB NNCR. This enables you to benefit from a software environment with pre-installed software tools for the different fields of bioinformatics.</p>
 <p>You should have recieved a login before starting the course. If this is not the case, see the information on account request on the IFB Web site (<a href="https://www.france-bioinformatique.fr/en/cluster" class="uri">https://www.france-bioinformatique.fr/en/cluster</a>).</p>
 <p>Before starting this tutorial, you should have followed the following introductory sessions</p>
@@ -372,13 +382,13 @@ div.tocify {
 <li><p><a href="https://ifb-elixirfr.gitlab.io/cluster/doc/slurm_user_guide/">Slurm user guide</a></p></li>
 </ul>
 </div>
-<div id="warning-about-command-line-use-of-the-cluster" class="section level2">
-<h2>Warning about command-line use of the cluster</h2>
+<div id="warning-about-command-line-use-of-the-cluster" class="section level1">
+<h1>Warning about command-line use of the cluster</h1>
 <p>Please remember: <strong>the sequence analysis tasks below should by no way run on the login node of the computer</strong>. Each job has to be sent to the <code>slurm</code> job scheduler using <code>srun</code> (submit a single command) or <code>sbacth</code> (submit a bash script), as explained in the tutorials of the prerequisite section.</p>
 <hr />
 </div>
-<div id="bioinformatics-resources-used-for-this-course" class="section level2">
-<h2>Bioinformatics resources used for this course</h2>
+<div id="bioinformatics-resources-used-for-this-course" class="section level1">
+<h1>Bioinformatics resources used for this course</h1>
 <table>
 <colgroup>
 <col width="11%" />
@@ -412,241 +422,160 @@ div.tocify {
 </table>
 <hr />
 </div>
-<div id="tutorial" class="section level2">
-<h2>Tutorial</h2>
-<hr />
+<div id="collecting-the-sequences" class="section level1">
+<h1>Collecting the sequences</h1>
+<div id="loading-the-required-modules-on-the-ifb-core-cluster" class="section level2">
+<h2>Loading the required modules on the IFB core cluster</h2>
+<p>The IFB core cluster comes with a modular software environment, which enables users to deploy the specific tools required for their analyses.</p>
+<p>In this section, we will open a connection to the IFB cluster and load the modules required for the practicals below.</p>
+<p>Task 1: use the command <code>module avail</code>to explore the lists of available modules and identify the two modules used for this course.</p>
+<ul>
+<li><strong>blast</strong>: Basic Local Alignment Search Tool</li>
+<li><strong>emboss</strong>: a software suite implemented by the European bioinformatics network EMBNet</li>
+</ul>
+<p>The solution can be seen by unfolding the code below.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">## Open a connection to the IFB core cluster</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">ssh</span> <span class="op">&lt;</span>username<span class="op">&gt;</span>@core.cluster.france-bioinformatique.fr</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co">## List the modules of your environment</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="ex">module</span> list</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co">## Hmm ... no module is currently loaded</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="co">## Get the list of available modules</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co">## Use the option -t to get one module per row</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="ex">module</span> avail -t</span>
+<span id="cb1-11"><a href="#cb1-11"></a></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co">## Identify the blast module</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="ex">module</span> avail -t <span class="kw">|</span> <span class="fu">grep</span> blast</span>
+<span id="cb1-14"><a href="#cb1-14"></a></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co">## Identify the emboss module</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="ex">module</span> avail -t <span class="kw">|</span> <span class="fu">grep</span> emboss</span></code></pre></div>
+<p>Task 2: Load the required modules.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">## Load required modules</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="ex">module</span> load blast</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="ex">module</span> load emboss</span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">## List loaded modules</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="ex">module</span> list</span></code></pre></div>
 </div>
-<div id="browsing-genomes-with-ensemblgenomes" class="section level2">
-<h2>Browsing genomes with EnsemblGenomes</h2>
-<p>As reference genome, we will use the strain <em>K12 MG1655</em> of <em>Escherichia coli</em>.</p>
+<div id="creating-a-workspace-for-this-tutorial" class="section level2">
+<h2>Creating a workspace for this tutorial</h2>
+<p>In your home directory on the IFB core cluster, create a folder named <code>cmb-comp-bio_ptracticals</code>, and a sub-folder named <code>proteome-blast_results</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">## Define the result directory for this practical and export it in an environment variable.</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="bu">export</span> <span class="va">RESULT_DIR=</span>~/cmb-comp-bio_ptracticals/proteome-blast_results</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">## Note: the -p command enables to create full path at once</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="fu">mkdir</span> -p <span class="va">${RESULT_DIR}</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="bu">cd</span> <span class="va">${RESULT_DIR}</span></span></code></pre></div>
+</div>
+<div id="collecting-the-proteome-of-interest-from-uniprot" class="section level2">
+<h2>Collecting the proteome of interest from Uniprot</h2>
+<p>We will use Uniprot Web interface to select a protein of interest, that will serve as query to search for homologous proteins in the selected proteome.</p>
+<p>For this tutorial, we will use the fruit fly <em>Drosophila melanogaster</em> as organism of interest</p>
+<ul>
+<li><p>Open a connection to <a href="http://uniprot.org">uniprot.org</a></p></li>
+<li><p>Use the advanced serarches to formulate structured queries</p></li>
+<li><p>Select the Organism. Start typing <em>Drosophila melanogaster</em> and wait for a few seconds. Among the possible completions displayed, select the following one.</p>
+<p><em>Drosophila melanogaster (Fruit fly) [7227]</em></p>
+<p>Note: the number <a href="https://www.ncbi.nlm.nih.gov/taxonomy/?term=7227">7227</a> is the identifier of this species in the NCBI taxonomic database.</p></li>
+<li><p>Click <strong>Search</strong>. This will select all the proteins of the selected organism. The result table only displays a summary information for 25 entries.</p></li>
+<li><p>On the top of the result page, click <strong>Download</strong> and download all proteins in fasta format on your computer.</p>
+<p>Note: by default the sequence file is compressed with the <code>gzip</code> algorithm, you should thus obtain a binary file with the extension <code>.fasta.gz</code>.</p></li>
+<li><p>Locate the downloaded file on your computer, and rename if with a simpler name, for example <code>Drosophila_melanogaster_proteome.fasta.gz</code><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p></li>
+<li><p>Use the terminal to check the begining of this file</p></li>
+</ul>
+</div>
+<div id="transferring-a-sequence-file-to-your-account-on-ifb-core-cluster" class="section level2">
+<h2>Transferring a sequence file to your account on IFB core cluster</h2>
+<div id="practical" class="section level3">
+<h3>Practical</h3>
 <ol style="list-style-type: decimal">
-<li><p>In a web browser, open a connexion to Ensembl Bacteria (<a href="https://bacteria.ensembl.org" class="uri">https://bacteria.ensembl.org</a>).</p></li>
-<li><p>In the <strong>Search for a genome</strong> box, type <em>MG1655</em>. The interface will display a list of the genomes matching this string. Select the strain with taxonomic ID (TAXID) <em>511145</em>.</p></li>
+<li>Open a new terminal on your computer, and use the Unix command <code>scp</code> to copy the proteome sequence file in the result directory of the core cluster.</li>
 </ol>
-<div class="figure" style="text-align: center">
-<img src="images/ensembl_bacteria_organism_selection.png" alt="**EnsemblGenomes Bacteria organism choice**. " width="60%" />
-<p class="caption">
-<strong>EnsemblGenomes Bacteria organism choice</strong>.
-</p>
-</div>
+<p>Note that an alternative is to use a user-friendly program (e.g. Filezilla) to transfer this file. For more information read the section on <a href="https://ifb-elixirfr.gitlab.io/cluster/doc/data/">data transfer</a> in the IFB cluster documentation.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">## Go to your download folder. Note: this can vary depending on your operating system</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="bu">cd</span> ~/Downloads</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">## Check that the fasta file is there</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="fu">ls</span> -l Drosophila_melanogaster_proteome.fasta.gz</span>
+<span id="cb4-6"><a href="#cb4-6"></a></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">## Check the content of the file (use zless to directly see the content of the compressed file)</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="fu">zless</span> Drosophila_melanogaster_proteome.fasta.gz</span>
+<span id="cb4-9"><a href="#cb4-9"></a></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">## REPLACE &lt;username&gt; by your own username</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="fu">scp</span> Drosophila_melanogaster_proteome.fasta.gz \</span>
+<span id="cb4-12"><a href="#cb4-12"></a>  <span class="op">&lt;</span>username<span class="op">&gt;</span>@core.cluster.france-bioinformatique.fr:cmb-comp-bio_ptracticals/proteome-blast_results/</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Come back to your <code>ssh</code> session on the IFB core cluster and check that the seque ce file is in the right directory, and contains the compressed proteome sequence file (extension <code>.fasta.gz</code>).</li>
+</ol>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="bu">cd</span> <span class="va">$RESULT_DIR</span> <span class="co">## Make sure you are in the result directory</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">ls</span> -ltr   <span class="co">## List the files sorted by date (most recent last)</span></span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
-<li>After having selected your bacteria of interest, type <em>aspartokinase</em> in the search box and start the search.</li>
+<li>Measure the size (in megabase) of the compressed sequence file (command: <code>du</code>), then uncompress it (command: <code>gunzip</code>) and measure the size of the uncompressed file.</li>
 </ol>
-<div class="figure" style="text-align: center">
-<img src="images/ensembl_bacteria_search_aspartokinase.png" alt="**EnsemblGenomes gene search**. " width="60%" />
-<p class="caption">
-<strong>EnsemblGenomes gene search</strong>.
-</p>
-</div>
-<ol start="4" style="list-style-type: decimal">
-<li>Read the annotation of the three first matches. Note the names of the genes coding for these three enzymes.</li>
-</ol>
-<div class="figure" style="text-align: center">
-<img src="images/Ecoli_aspartokinase_search_result.png" alt="**EnsemblGenomes search result for *aspartokinase***. " width="60%" />
-<p class="caption">
-<strong>EnsemblGenomes search result for <em>aspartokinase</em></strong>.
-</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">## Measure the size of the compressed proteome file</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">du</span> -sm Drosophila_melanogaster_proteome.fasta.gz</span>
+<span id="cb6-3"><a href="#cb6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">## Uncompress the proteome file</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="fu">gunzip</span> Drosophila_melanogaster_proteome.fasta.gz</span>
+<span id="cb6-6"><a href="#cb6-6"></a></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">## Measure the size of the uncompressed proteome file</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="fu">du</span> -sm Drosophila_melanogaster_proteome.fasta</span></code></pre></div>
 </div>
 </div>
-<div id="downloading-genomic-features-and-protein-sequences" class="section level2">
-<h2>Downloading genomic features and protein sequences</h2>
-<p>We will use blast on the command line to search for homologs of <em>E.coli</em> aspartokinases in other bacterial genomes.</p>
-<p>Each student will chose a different bacteria to perform the search.</p>
-</div>
-<div id="downloading-protein-sequences-and-gene-annotations-from-ensembl-genome" class="section level2">
-<h2>Downloading protein sequences and gene annotations from Ensembl genome</h2>
-<ol style="list-style-type: decimal">
-<li><p>In a separate window, open a connection to <a href="https://bacteria.ensembl.org/">EnsemblGenomes Bacteria</a> (<a href="https://bacteria.ensembl.org/" class="uri">https://bacteria.ensembl.org/</a>).</p></li>
-<li><p>Click on the **Downloads* link (you can also access it directly here: <a href="https://bacteria.ensembl.org/info/website/ftp/" class="uri">https://bacteria.ensembl.org/info/website/ftp/</a>).</p></li>
-<li><p>In the <strong>filter</strong> box, type MG1655. This select the subset of genomes whose name contains this string.</p></li>
-</ol>
-<div class="figure" style="text-align: center">
-<img src="images/ensemblgenomes_bacteria_ftp_mg1655.png" alt="**EnsemblGenomes download filter**. " width="60%" />
-<p class="caption">
-<strong>EnsemblGenomes download filter</strong>.
-</p>
-</div>
-<ol start="4" style="list-style-type: decimal">
-<li><p>Click on the <strong>FASTA</strong> link in the column <strong>Protein sequences</strong>/</p></li>
-<li><p>and select <strong>Copy link address</strong>.</p></li>
-</ol>
-<div class="figure" style="text-align: center">
-<img src="images/protein_fasta_link.png" alt="**EnsemblGenomes** Link to download all protein sequences for a selected organism. " width="200" />
-<p class="caption">
-<strong>EnsemblGenomes</strong> Link to download all protein sequences for a selected organism.
-</p>
-</div>
-<ol start="5" style="list-style-type: decimal">
-<li><p>Come back to the Unix terminal of the IFB NNCR.</p></li>
-<li><p>Create a directory for the current practical.</p></li>
-</ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">mkdir</span> -p ~/bacteria_blast</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="bu">cd</span> ~/bacteria_blast</span></code></pre></div>
-<ol start="7" style="list-style-type: decimal">
-<li>type <code>wget --no-clubber</code> and paste the content of the clipboard. This should give the following command (note: at the tiem you run this tutorial, the release may be different, this one is from October 2018).</li>
-</ol>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">wget</span> --no-clobber ftp://ftp.ensemblgenomes.org/pub/release-41/bacteria//fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/pep/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa.gz</span></code></pre></div>
-<p>If you want to know the meaning of the <code>--no-clobber</code> option you can checek <code>wget</code> manual with the command.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">man</span> wget</span></code></pre></div>
-<p>We will now check if the file has been correctly downloaded, and uncompress it.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a></span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="co">## Check that the file is there</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="fu">ls</span> -l</span>
-<span id="cb4-4"><a href="#cb4-4"></a></span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="co">## Uncompress the file</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="fu">gunzip</span> Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa.gz</span>
-<span id="cb4-7"><a href="#cb4-7"></a></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="co"># Measure the size of the uncompressed file</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="fu">du</span> -k Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa</span>
-<span id="cb4-10"><a href="#cb4-10"></a></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="co"># Check the 20 fist lines of the file</span></span>
-<span id="cb4-12"><a href="#cb4-12"></a><span class="fu">head</span> -n 20 Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa</span>
-<span id="cb4-13"><a href="#cb4-13"></a></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="co"># Check the 20 last lines of the file</span></span>
-<span id="cb4-15"><a href="#cb4-15"></a><span class="fu">tail</span> -n 20 Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa</span></code></pre></div>
-</div>
-<div id="downloading-genome-annotations" class="section level2">
-<h2>Downloading genome annotations</h2>
-<p>After having downloaded the protein sequences, we will download gene annotations. In EnsemblGenomes, annotations are available in different formats, including GTF, a text file with columns separated by tabulations.</p>
-<ol style="list-style-type: decimal">
-<li><p>We In the browser, come back to the EnsemblGenomes Bacteria Download site, select MG1655 and follow the same instructions as above to download and uncompress the GTF file.</p></li>
-<li><p>Uncompress the gzip archive.</p></li>
-</ol>
-<div id="solution" class="section level3">
-<h3>Solution</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">## Download genome annotation file (GTF format)</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">wget</span> --no-clobber ftp://ftp.ensemblgenomes.org/pub/release-41/bacteria//gtf/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.41.gtf.gz</span>
-<span id="cb5-3"><a href="#cb5-3"></a></span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="co">## Uncompress genome annotation file</span></span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="fu">gunzip</span> Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.41.gtf.gz</span>
-<span id="cb5-6"><a href="#cb5-6"></a></span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="co">## Check that the uncompressed file is there</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="fu">ls</span> Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.41.gtf</span>
-<span id="cb5-9"><a href="#cb5-9"></a></span>
-<span id="cb5-10"><a href="#cb5-10"></a><span class="co">## Check the head of the annotaiton file</span></span>
-<span id="cb5-11"><a href="#cb5-11"></a><span class="fu">head</span> -n 20 Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.41.gtf</span>
-<span id="cb5-12"><a href="#cb5-12"></a></span>
-<span id="cb5-13"><a href="#cb5-13"></a><span class="co">## Check the tail</span></span>
-<span id="cb5-14"><a href="#cb5-14"></a><span class="fu">tail</span> -n 10 Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.41.gtf</span></code></pre></div>
-</div>
-</div>
-<div id="exercise-genome-annotations" class="section level2">
-<h2>Exercise: genome annotations</h2>
-<p>As an exercise, you will now elaborate Unix commands to explore the content of E.coli genome annotations.</p>
-<p>For this, we recommmend to use and combine the following commands. In order to fine-tune the parameters, read their manual on the Unix terminal by typing <code>man [command_name]</code> (for example <code>man wc</code>).</p>
-<table>
-<colgroup>
-<col width="13%" />
-<col width="86%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Command</th>
-<th>Usage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>wc</td>
-<td>count lines, words and characters of a file</td>
-</tr>
-<tr class="even">
-<td>cut</td>
-<td>cut specific columns of a text file</td>
-</tr>
-<tr class="odd">
-<td>grep</td>
-<td>select rows of a file that match a given query (string, regular expression)</td>
-</tr>
-<tr class="even">
-<td>awk</td>
-<td>a powerful tool to work on text files, combining row filters, column selections, and many other features.</td>
-</tr>
-<tr class="odd">
-<td>sort</td>
-<td>sort the rows of a text file based on user-specified columns. The sorting can be done either alphabetically or numerically, in ascending or descending order</td>
-</tr>
-<tr class="even">
-<td>uniq</td>
-<td>discard redundant lines from a text file. The option <code>-c</code> counts the number of occurrences of each line in a redundant file</td>
-</tr>
-</tbody>
-</table>
-<p>You can learn more Unix commands by typing “Linux cheat sheet” in any Web search engine.</p>
-<p>We ask you to write all the answers in a text file, with comments, in order to enable other people to reproduce all your commands.</p>
-<div id="questions" class="section level3">
-<h3>Questions</h3>
-<ol style="list-style-type: decimal">
-<li><p>How many rows contains the GTF file for E.coli K12 MG1655 ?</p></li>
-<li><p>How many annotation rows are there in the GTF file (for this, you need to discard the comment rows starting with a <code>#</code> character) ?</p></li>
-<li><p>How many of these rows correspond to genes ?</p></li>
-<li><p>Count the number of instnces of each feature type in the GTF file.</p></li>
-<li><p>Select all the rows of the GTF file corresponding to a gene, and store them in a separate file named <code>genes_Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.41.gtf</code>.</p></li>
-</ol>
-</div>
-<div id="solution-1" class="section level3">
-<h3>Solution</h3>
+<div id="getting-a-query-sequence" class="section level2">
+<h2>Getting a query sequence</h2>
+<ul>
+<li><p>Click on the Advanced search again. Your previous query is still displayed. Click the big <strong>+</strong> symbol to add a criterion, select <strong>Protein name</strong> and type <em>Histone H3</em>.</p></li>
+<li><p>Click on the link to the protine named <em>Histone H3</em> (with ID <a href="https://www.uniprot.org/uniprot/P02299">P02299</a>). You will see the full record of annotations for this protein.</p></li>
+<li><p>Select <strong>Format</strong> <span class="math inline">\(\rightarrow\)</span> <strong>Fasta</strong>. This displays the sequence of Histone 3 in fasta format. We will use this sequence as query for BLAST.</p></li>
+<li><p>Copy the link of this sequence (<a href="https://www.uniprot.org/uniprot/P02299.fasta" class="uri">https://www.uniprot.org/uniprot/P02299.fasta</a>) in a file.</p></li>
+<li><p>Come back to the IFB core cluster terminal, make sure you are in the results directory, and use the Unix command <code>wget</code> to download the sequence.</p></li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="bu">cd</span> <span class="va">$RESULT_DIR</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="fu">wget</span> --no-clobber https://www.uniprot.org/uniprot/P02299.fasta</span></code></pre></div>
+<p>Note: we use the option –no-clobber. To know why, read the wget manual after typing the command <code>man wget</code>. In Unix man pages, you can find a given word (e.g. clobber) by typing <code>/</code> followed by the search string.</p>
 <hr />
 </div>
 </div>
 <div id="searching-sequence-similarities-with-blast" class="section level1">
 <h1>Searching sequence similarities with BLAST</h1>
-<div id="activating-the-conda-environment-for-blast-on-the-nncr-cluster" class="section level2">
-<h2>Activating the conda environment for blast on the NNCR cluster</h2>
-<p>In addition to facilitating the installation of software tools on different operating system, conda also permits to create modules that regroup a set of tools usually used together (for example NGS analysis, protein structure, proteomics, …).</p>
-<p>The IFB NNCR cluster is already equipped with a series of conda environments with the classical bioinformatics tools. Before being able to use a tool, you must activate the corresponding environment.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">## List the conda environments available on the system</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="va">$CONDA_HOME</span><span class="ex">/bin/conda</span> env list</span>
-<span id="cb6-3"><a href="#cb6-3"></a></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="co">## FInd the blast environment</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="va">$CONDA_HOME</span><span class="ex">/bin/conda</span> env list <span class="kw">|</span> <span class="fu">grep</span> -i blast</span>
-<span id="cb6-6"><a href="#cb6-6"></a></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">## Activate the blast environment. </span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="bu">source</span> <span class="va">$CONDA_HOME</span>/bin/activate blast-2.7.1</span>
-<span id="cb6-9"><a href="#cb6-9"></a></span>
-<span id="cb6-10"><a href="#cb6-10"></a><span class="co">## Check the location of the blastp command</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a><span class="fu">which</span> blastp</span>
-<span id="cb6-12"><a href="#cb6-12"></a></span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="co">## Deactivate the current environment. </span></span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="bu">source</span> <span class="va">$CONDA_HOME</span>/bin/deactivate</span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="co">## Note the change in the shell prompt</span></span>
-<span id="cb6-16"><a href="#cb6-16"></a></span>
-<span id="cb6-17"><a href="#cb6-17"></a><span class="co">## Re-activate the blast environment</span></span>
-<span id="cb6-18"><a href="#cb6-18"></a><span class="bu">source</span> <span class="va">$CONDA_HOME</span>/bin/activate blast-2.7.1</span>
-<span id="cb6-19"><a href="#cb6-19"></a><span class="co">## Note the change in the shell prompt</span></span></code></pre></div>
-<p>Note: if you are working on a machine that does not belong to the federation of NNCR clusters, you can create the blast environment in your own conda folder with the following command (assuming that the conda package has been installed and that its executable files are in your path).</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">## </span><span class="al">ATTENTION</span><span class="co">: DO NOT RUN THIS COMMAND IF YOU ARE ON THE NNCR CLUSTER,</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="co">## because this would occupy a big space to reinstall BLAST in your </span></span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="co">## own account, although it is already available for all users. </span></span>
-<span id="cb7-4"><a href="#cb7-4"></a></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="co">## Install blast</span></span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="ex">conda</span> create -n blast-2.7.1 blast==2.7.1</span>
-<span id="cb7-7"><a href="#cb7-7"></a></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="co">## Install emboss</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a><span class="ex">conda</span> create -n emboss-6.6.0 emboss==6.6.0</span></code></pre></div>
-</div>
 <div id="formatting-the-blast-database-for-the-reference-genome" class="section level2">
 <h2>Formatting the blast database for the reference genome</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">## Check the path of the program makeblastdb (it should be in your conda folder)</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">which</span> makeblastdb</span>
+<p>Before being able to run sequence similarity searches, BLAST needs to read the sequence database (in our case, the proteome) in order to build an index of the k-mers (oligopeptides). This is done with the command <code>makeblastdb</code>.</p>
+<div id="practical-1" class="section level3">
+<h3>Practical</h3>
+<ol style="list-style-type: decimal">
+<li><p>Display the <code>makeblastdb</code> options (<code>-h</code>) manual (<code>-help</code>). Well, the the manual is quite heavy, so we give you the equired options: <code>-in</code> and <code>-dbtype</code>. Read the usage of these options in the manual, built the command and run it.</p></li>
+<li><p>Build a command (<strong>DO NOT RUN IT YET</strong>) to index the proteome of interest.</p></li>
+<li><p>Send this command to the job scheduler via <code>srun</code>.</p></li>
+<li><p>Check the result files.</p></li>
+</ol>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash fold-hide"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">## Make sure the blast module is loaded</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="ex">module</span> load blast</span>
 <span id="cb8-3"><a href="#cb8-3"></a></span>
-<span id="cb8-4"><a href="#cb8-4"></a><span class="co">## Get the usage of makeblastdb (formal specification of the command syntax)</span></span>
-<span id="cb8-5"><a href="#cb8-5"></a><span class="ex">makeblastdb</span> -h</span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">## Check the path of the program makeblastdb (it should be in your conda folder)</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="fu">which</span> makeblastdb</span>
 <span id="cb8-6"><a href="#cb8-6"></a></span>
-<span id="cb8-7"><a href="#cb8-7"></a><span class="co">## Get the help for makeblastdb (explanation of the options)</span></span>
-<span id="cb8-8"><a href="#cb8-8"></a><span class="ex">makeblastdb</span> -help</span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">## Get the usage of makeblastdb (formal specification of the command syntax)</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="ex">makeblastdb</span> -h</span>
 <span id="cb8-9"><a href="#cb8-9"></a></span>
-<span id="cb8-10"><a href="#cb8-10"></a><span class="co">## Build a BLAST database with all the protein sequences of E.coli</span></span>
-<span id="cb8-11"><a href="#cb8-11"></a><span class="ex">makeblastdb</span> -in Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa  -dbtype prot</span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="co">## Get the help for makeblastdb (explanation of the options)</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="ex">makeblastdb</span> -help</span>
 <span id="cb8-12"><a href="#cb8-12"></a></span>
-<span id="cb8-13"><a href="#cb8-13"></a><span class="co">## Check the new files that were created with this commands. </span></span>
-<span id="cb8-14"><a href="#cb8-14"></a><span class="co">## For this we list the files in reverse (-r) temporal (-t) order. </span></span>
-<span id="cb8-15"><a href="#cb8-15"></a><span class="fu">ls</span> -1tr</span></code></pre></div>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co">## Build a BLAST database with all the protein sequences of D.melanogaster</span></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="ex">srun</span> makeblastdb -dbtype prot -in Drosophila_melanogaster_proteome.fasta</span>
+<span id="cb8-15"><a href="#cb8-15"></a></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="co">## Check the new files that were created with this commands. </span></span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="co">## For this we list the files in reverse (-r) temporal (-t) order. </span></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="fu">ls</span> -1tr</span></code></pre></div>
 <p>The program <code>makeblastdb</code> created three files besides the input fasta file.</p>
-<pre><code>Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa.pin
-Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa.phr
-Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa.psq</code></pre>
+<pre><code>Drosophila_melanogaster_proteome.fasta.pin
+Drosophila_melanogaster_proteome.fasta.phr
+Drosophila_melanogaster_proteome.fasta.psq</code></pre>
 <p>These files contain an index of all the oligopeptites found in all the sequences of the fasta file. This “k-mer” index will be used by BLAST to rapidly find all the sequences in the database that match a query sequence, and use these short correspondences to start an alignment.</p>
+</div>
 </div>
 <div id="read-blastp-manual" class="section level2">
 <h2>Read <em>blastp</em> manual</h2>
@@ -656,28 +585,23 @@ Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa.psq</code></pre>
 <span id="cb10-3"><a href="#cb10-3"></a></span>
 <span id="cb10-4"><a href="#cb10-4"></a><span class="co">## Help</span></span>
 <span id="cb10-5"><a href="#cb10-5"></a><span class="ex">blastp</span> -help</span></code></pre></div>
-<p>OK, the first contact is a bit frightening, because blastp has many options. This is because this program allows you to run queries in different modes, with different parameters, and to export the results in different formats.</p>
+<p>OK, the first contact is a bit frightening, because blastp has many options. This is because it allows you to run queries in different modes, with different parameters, and to export the results in different formats.</p>
 <p>In this tutorial we will show you the most usual ways to use the tool, and you will then be able to refine your search by combing back to the manual and understanding the use of additional options.</p>
-</div>
-<div id="downloading-a-query-protein" class="section level2">
-<h2>Downloading a query protein</h2>
-<p>We will first search similarities from a given protein of interest. We will start from the “askartokinase 3” protein from <em>Escherichia coli</em>, which is the product of the gene lysC.</p>
-<p>Before starting the analysis, read the Uniprot record (<a href="https://www.uniprot.org/uniprot/P08660" class="uri">https://www.uniprot.org/uniprot/P08660</a>) in order to know the function and regulation of this protein.</p>
-<p>We will use BLAST to identify all the proteins of <em>Escherichia coli</em> that have significant similarities with the aspartokinase 3.</p>
-<p>For this we first need to download the sequence of this protein on our computer. The sequence can be downloaded directly from Uniprot.</p>
-<pre class="blast"><code>wget --no-clobber https://www.uniprot.org/uniprot/P08660.fasta</code></pre>
 </div>
 <div id="similaroty-search-for-one-sequence-against-a-database" class="section level2">
 <h2>Similaroty search for one sequence against a database</h2>
-<p>The following command search similarities for one or several query sequences provided in a fasta file (<code>P08660.fasta</code>) in a protein sequence database (<code>Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa</code>). By default, blastp prints the result on the screen, but we prefer to redirect it to a file in order to keep a trace of the result and inspect it later.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">## Search similarities for aspartokinase 3 in E.coli proteome</span></span>
-<span id="cb12-2"><a href="#cb12-2"></a><span class="ex">blastp</span> \</span>
-<span id="cb12-3"><a href="#cb12-3"></a>  -db Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa  \</span>
-<span id="cb12-4"><a href="#cb12-4"></a>  -query P08660.fasta \</span>
-<span id="cb12-5"><a href="#cb12-5"></a>  <span class="op">&gt;</span> lysC_vs_Ecoli.txt</span>
-<span id="cb12-6"><a href="#cb12-6"></a>  </span>
-<span id="cb12-7"><a href="#cb12-7"></a><span class="co">## Check the result</span></span>
-<span id="cb12-8"><a href="#cb12-8"></a><span class="fu">less</span> lysC_vs_Ecoli.txt</span></code></pre></div>
+<ol style="list-style-type: decimal">
+<li><p>Build a command (<strong>DO NOT RUN IT YET</strong>) that searches similarities for one or several query sequences provided in a fasta file (e.g. <code>P02299.fasta</code>) in the proteome of interest (<code>Drosophila_melanogaster_proteome.fasta</code>). By default, <code>blastp</code> prints the result on the screen, but we prefer to redirect it to a file (e.g. <code>P02299_blastp_result.txt</code>) in order to keep a trace of the result and inspect it later.</p></li>
+<li><p>Send this command to the job scheduler with <code>srun</code>.</p></li>
+</ol>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="co">## Search similarities for histone 3 in D.melanogaster proteome</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="ex">srun</span> blastp \</span>
+<span id="cb11-3"><a href="#cb11-3"></a>  -db Drosophila_melanogaster_proteome.fasta  \</span>
+<span id="cb11-4"><a href="#cb11-4"></a>  -query P02299.fasta \</span>
+<span id="cb11-5"><a href="#cb11-5"></a>  <span class="op">&gt;</span> P02299_blastp_result.txt</span>
+<span id="cb11-6"><a href="#cb11-6"></a>  </span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">## Check the result</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="fu">less</span> P02299_blastp_result.txt</span></code></pre></div>
 <div id="question-set-1" class="section level3">
 <h3>Question set 1</h3>
 <p><font color="#004488"> 1. How many hits were found in total? 2. How many of these have an E-value higher than 1? 3. What was the threshold on the E-value for this blastp search? 4. With this threshold, how many hits would we expeect if we use a random sequence as query? 5. How many alignments would you consider significant in this result? 6. How many of these would you qualify of homologs? 7. For each of these putative homologs, is it a paralog, ortholog or “other log”? 8. Do you see a relationship between the E-value and some properties of the alignments? </font></p>
@@ -686,86 +610,103 @@ Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa.psq</code></pre>
 <div id="getting-a-tabular-synthesis-of-blast-results" class="section level2">
 <h2>Getting a tabular synthesis of blast results</h2>
 <p>By default, BLAST displays the detailed results of a similaty search, starting with a summary of the matches, followed by all the alignemnts. It can be convenient to generate a synthetic result indicating only the relevant statistics for each alignment. This can be done by tuning BLAST options.</p>
-<p>Read blastp manual and find a way to tune the formatting options in order to get a tabular output with comments.</p>
-<div id="solution-2" class="section level3">
+<ol style="list-style-type: decimal">
+<li><p>Read blastp manual and find a way to tune the formatting options in order to get a tabular output with comments.</p></li>
+<li><p>Refine the query by selecting the following fields in the tabilar option:</p>
+<ul>
+<li>ID of the “subject” sequence (the one found in the proteome of interest)</li>
+<li>length of the query sequence</li>
+<li>length of the subject sequence</li>
+<li>raw score of the alignment</li>
+<li>e-value</li>
+</ul></li>
+</ol>
+<div id="solution" class="section level3">
 <h3>Solution</h3>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">## Search similarities for aspartokinase 3 in E.coli proteome.</span></span>
-<span id="cb13-2"><a href="#cb13-2"></a><span class="co">## Return the result as a synthetic table with the matching statistics for each hit. </span></span>
-<span id="cb13-3"><a href="#cb13-3"></a><span class="ex">blastp</span> -outfmt 7 \</span>
-<span id="cb13-4"><a href="#cb13-4"></a>  -db Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa  \</span>
-<span id="cb13-5"><a href="#cb13-5"></a>  -query P08660.fasta \</span>
-<span id="cb13-6"><a href="#cb13-6"></a>  <span class="op">&gt;</span> lysC_vs_Ecoli_synthesis.tsv</span>
-<span id="cb13-7"><a href="#cb13-7"></a></span>
-<span id="cb13-8"><a href="#cb13-8"></a><span class="co">## Check the result</span></span>
-<span id="cb13-9"><a href="#cb13-9"></a><span class="fu">more</span> lysC_vs_Ecoli_synthesis.tsv</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">## Search similarities for histone 3 in D.melanogaster proteome.</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="co">## Return the result as a synthetic table with the matching statistics for each hit. </span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="ex">srun</span> blastp  \</span>
+<span id="cb12-4"><a href="#cb12-4"></a>  -db Drosophila_melanogaster_proteome.fasta  \</span>
+<span id="cb12-5"><a href="#cb12-5"></a>  -query P02299.fasta \</span>
+<span id="cb12-6"><a href="#cb12-6"></a>  -outfmt 7 \</span>
+<span id="cb12-7"><a href="#cb12-7"></a>  <span class="op">&gt;</span> P02299_blastp_summary.tsv</span>
+<span id="cb12-8"><a href="#cb12-8"></a></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co">## Check the result</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="fu">more</span> P02299_blastp_summary.tsv</span>
+<span id="cb12-11"><a href="#cb12-11"></a></span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="co">## Return table with selected fields</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a><span class="ex">srun</span> blastp \</span>
+<span id="cb12-14"><a href="#cb12-14"></a>  -db Drosophila_melanogaster_proteome.fasta  \</span>
+<span id="cb12-15"><a href="#cb12-15"></a>  -query P02299.fasta \</span>
+<span id="cb12-16"><a href="#cb12-16"></a>  -outfmt <span class="st">&quot;6 sseqid qlen slen length score  evalue&quot;</span> \</span>
+<span id="cb12-17"><a href="#cb12-17"></a>  <span class="op">&gt;</span> P02299_blastp_summary.tsv</span>
+<span id="cb12-18"><a href="#cb12-18"></a></span>
+<span id="cb12-19"><a href="#cb12-19"></a><span class="co">## Check the result</span></span>
+<span id="cb12-20"><a href="#cb12-20"></a><span class="fu">more</span> P02299_blastp_summary.tsv</span></code></pre></div>
 </div>
 </div>
 </div>
 <div id="negative-control-blast-against-a-shuffled-sequence" class="section level1">
 <h1>Negative control: blast against a shuffled sequence</h1>
 <p>In this section, we will perform a quick empirical test, by submitting a random sequence to blastp. For this, we will shuffle the aminoacids of the original query sequence.</p>
-<!--
-## Shuffling sequences with a Web tool
-
-One way to shuffle sequences is to use a convenient Web tool at <http://www.bioinformatics.org/sms2/shuffle_protein.html>
--->
 <div id="shuffling-sequences-with-emboss-shuffleseq" class="section level2">
 <h2>Shuffling sequences with EMBOSS shuffleseq</h2>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">## Activate the conda environment with the emboss software suite</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a><span class="bu">source</span>  <span class="va">$CONDA_HOME</span>/bin/activate emboss-6.6.0</span>
-<span id="cb14-3"><a href="#cb14-3"></a></span>
-<span id="cb14-4"><a href="#cb14-4"></a><span class="co">## Check that shuffleseq is available</span></span>
-<span id="cb14-5"><a href="#cb14-5"></a><span class="fu">which</span> shuffleseq</span>
-<span id="cb14-6"><a href="#cb14-6"></a></span>
-<span id="cb14-7"><a href="#cb14-7"></a><span class="co">## Get the suffle manual </span></span>
-<span id="cb14-8"><a href="#cb14-8"></a><span class="ex">shuffleseq</span> -h</span>
-<span id="cb14-9"><a href="#cb14-9"></a></span>
-<span id="cb14-10"><a href="#cb14-10"></a><span class="co">## Shuffle the apartokinase 3 sequence</span></span>
-<span id="cb14-11"><a href="#cb14-11"></a><span class="ex">shuffleseq</span> -sequence P08660.fasta -outseq shuffled_lysC.fa</span>
-<span id="cb14-12"><a href="#cb14-12"></a></span>
-<span id="cb14-13"><a href="#cb14-13"></a><span class="co">## Check the result</span></span>
-<span id="cb14-14"><a href="#cb14-14"></a><span class="fu">cat</span> shuffled_lysC.fa</span>
-<span id="cb14-15"><a href="#cb14-15"></a></span>
-<span id="cb14-16"><a href="#cb14-16"></a><span class="co">## Compare the shuffled seq with the original one</span></span>
-<span id="cb14-17"><a href="#cb14-17"></a><span class="fu">cat</span> P08660.fasta</span></code></pre></div>
+<ol style="list-style-type: decimal">
+<li>Load the emboss module</li>
+<li>Read the manual of the <code>shuffleseq</code> tool.</li>
+<li>Send a command to the job scheduler to generate a shuffled version of the query sequence.</li>
+</ol>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">## Activate the module with the emboss software suite</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="ex">module</span> load emboss</span>
+<span id="cb13-3"><a href="#cb13-3"></a></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">## Check that shuffleseq is available</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="fu">which</span> shuffleseq</span>
+<span id="cb13-6"><a href="#cb13-6"></a></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co">## Get the suffle manual </span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="ex">shuffleseq</span> -h</span>
+<span id="cb13-9"><a href="#cb13-9"></a></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co">## Shuffle the apartokinase 3 sequence</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="ex">srun</span> shuffleseq -sequence P02299.fasta -outseq shuffled_P02299.fasta</span>
+<span id="cb13-12"><a href="#cb13-12"></a></span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="co">## Check the result</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="fu">cat</span> shuffled_P02299.fasta</span>
+<span id="cb13-15"><a href="#cb13-15"></a></span>
+<span id="cb13-16"><a href="#cb13-16"></a><span class="co">## Compare the shuffled seq with the original one</span></span>
+<span id="cb13-17"><a href="#cb13-17"></a><span class="fu">cat</span> P02299.fasta</span></code></pre></div>
 <p>Here is an example of result (I just simplified the header of the shuffle output fasta sequence for the sake of readability).</p>
 <p>Of course, your result should differ since each shuffling produces a randomized sequence.</p>
-<pre><code>&gt;shuffled_lysC
-VEAINNAVKRELSALGDVADLFVLEFDNDRLGWADAIIRVLLNTEMNGELKPAEVASAIV
-GLIDEPELDTLVYSPLAGIFFLMCLIDFRGLGRREPTVPHSIMAGSGNALCRYFVTGLLL
-LDTNAFAIRETKNLEAFVAEFQAADNFAQARNPANLPKLILCLSVNGVLQASPFFNLNEG
-ADVVSESSAASLKADEDQSVITLEEDIVVTEGASSFDLALGLLMHLNVDRKVGAEWLEDE
-VSPVMVEVLTLVLTQEALTVTSIALLRGDTRKRVGLVLNSFTSHDLIAPSLILIGTSLVT
-RHFLVGAKVRIQERKASTSFRRLLAGRTETYRGLEIYAPCISMTTAVRRMQAGGIAHREI
-QETIACRKSTELLSTIASPHAEVGFEAANGTLLGVLTADHVSMALQAVNGGESLPDEHRR
-TVGDILTERVARLLLPFKEGPARTSSTLA</code></pre>
+<pre><code>&gt;shuffled_H3_DROME
+LMKPEQMLIAKKKDTKRVLASVRGIHRIARKVARTERLQKVLFRKTIAFALAGDICGQPT
+ESAPRTADLAQAVIFRHGTRPTRYTAPLSMQGKSYNLFGRQEDEQRASARASELTAIPKL
+KVYERGAKAKQTRRLR</code></pre>
 </div>
 <div id="exercise" class="section level2">
 <h2>Exercise</h2>
 <ol style="list-style-type: decimal">
-<li><p>Shuffle the aspartokinase 3 sequence with the tool <code>shuffleseq</code> (found in the conda environment <code>emboss</code>).</p></li>
-<li><p>Run a <code>blastp</code> search with this shuffled sequence against all proteins of <em>Escherichia coli</em>.</p></li>
+<li><p>Shuffle the histone 3 sequence with the tool <code>shuffleseq</code> (found in the conda environment <code>emboss</code>).</p></li>
+<li><p>Run a <code>blastp</code> search with this shuffled sequence against the selected proteome.</p></li>
 </ol>
-<div id="solution-3" class="section level3">
+<div id="solution-1" class="section level3">
 <h3>Solution</h3>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="co">## Run blast with the shuffled lysC sequence against all E.coli proteins</span></span>
-<span id="cb16-2"><a href="#cb16-2"></a><span class="ex">blastp</span> \</span>
-<span id="cb16-3"><a href="#cb16-3"></a>  -db Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa  \</span>
-<span id="cb16-4"><a href="#cb16-4"></a>  -query shuffled_lysC.fa \</span>
-<span id="cb16-5"><a href="#cb16-5"></a>  <span class="op">&gt;</span> shuffled_lysC_vs_Ecoli.txt</span>
-<span id="cb16-6"><a href="#cb16-6"></a><span class="co">## Check the result</span></span>
-<span id="cb16-7"><a href="#cb16-7"></a><span class="fu">less</span> shuffled_lysC_vs_Ecoli.txt</span>
-<span id="cb16-8"><a href="#cb16-8"></a></span>
-<span id="cb16-9"><a href="#cb16-9"></a><span class="co">## Run the same query with a tabular output</span></span>
-<span id="cb16-10"><a href="#cb16-10"></a><span class="ex">blastp</span> -outfmt 7 \</span>
-<span id="cb16-11"><a href="#cb16-11"></a>  -db Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa  \</span>
-<span id="cb16-12"><a href="#cb16-12"></a>  -query shuffled_lysC.fa \</span>
-<span id="cb16-13"><a href="#cb16-13"></a>  <span class="op">&gt;</span> shuffled_lysC_vs_Ecoli_synthesis.tsv</span>
-<span id="cb16-14"><a href="#cb16-14"></a></span>
-<span id="cb16-15"><a href="#cb16-15"></a><span class="co">## Check the result</span></span>
-<span id="cb16-16"><a href="#cb16-16"></a><span class="fu">less</span> shuffled_lysC_vs_Ecoli_synthesis.tsv</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1"></a><span class="co">## Run blast with the shuffled lysC sequence against all D.melanogaster proteins</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="ex">srun</span> blastp \</span>
+<span id="cb15-3"><a href="#cb15-3"></a>  -db Drosophila_melanogaster_proteome.fasta  \</span>
+<span id="cb15-4"><a href="#cb15-4"></a>  -query shuffled_P02299.fasta \</span>
+<span id="cb15-5"><a href="#cb15-5"></a>  <span class="op">&gt;</span> shuffled_P02299_blastp_result.txt</span>
+<span id="cb15-6"><a href="#cb15-6"></a></span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="co">## Check the result</span></span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="fu">less</span> shuffled_P02299_blastp_result.txt</span>
+<span id="cb15-9"><a href="#cb15-9"></a></span>
+<span id="cb15-10"><a href="#cb15-10"></a><span class="co">## Run the same query with a tabular output</span></span>
+<span id="cb15-11"><a href="#cb15-11"></a><span class="ex">blastp</span> -outfmt 7 \</span>
+<span id="cb15-12"><a href="#cb15-12"></a>  -db Drosophila_melanogaster_proteome.fasta  \</span>
+<span id="cb15-13"><a href="#cb15-13"></a>  -query shuffled_P02299.fasta \</span>
+<span id="cb15-14"><a href="#cb15-14"></a>  <span class="op">&gt;</span> shuffled_P02299_blastp_summary.tsv</span>
+<span id="cb15-15"><a href="#cb15-15"></a></span>
+<span id="cb15-16"><a href="#cb15-16"></a><span class="co">## Check the result</span></span>
+<span id="cb15-17"><a href="#cb15-17"></a><span class="fu">less</span> shuffled_P02299_blastp_summary.tsv</span></code></pre></div>
 </div>
-<div id="questions-1" class="section level3">
+<div id="questions" class="section level3">
 <h3>Questions</h3>
 <ol style="list-style-type: decimal">
 <li>How many alignments would you expect by chance with the default blastp parameters?</li>
@@ -774,323 +715,70 @@ TVGDILTERVARLLLPFKEGPARTSSTLA</code></pre>
 <li>How many of these had an E-value smaller than 0.01?</li>
 <li>How many of these would you qualify of homologs?</li>
 </ol>
-</div>
-</div>
-</div>
-<div id="comparing-all-the-proteins-of-a-genome-against-another-genome" class="section level1">
-<h1>Comparing all the proteins of a genome against another genome</h1>
-<div id="downloading-a-query-genome" class="section level2">
-<h2>Downloading a query genome</h2>
-<ol style="list-style-type: decimal">
-<li><p>Open a connection to the <a href="https://bacteria.ensembl.org/info/website/ftp/">EnsemblGenomes Download page</a> <a href="https://bacteria.ensembl.org/info/website/ftp/" class="uri">https://bacteria.ensembl.org/info/website/ftp/</a></p></li>
-<li><p>Identify the genome of your organism of interest (for this tutorial, I will choose <em>Bacillus subtilis subsp. subtilis str. 168</em>, but each student should take a different organism).</p></li>
-<li><p>Download the genome annotation (GTF file) and protein sequences (fasta file).</p></li>
-</ol>
-<div id="solution-4" class="section level3">
-<h3>Solution</h3>
-<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1"></a><span class="co">## Download genome annotations for organism of interest</span></span>
-<span id="cb17-2"><a href="#cb17-2"></a><span class="fu">wget</span> --no-clobber ftp://ftp.ensemblgenomes.org/pub/release-41/bacteria//gtf/bacteria_0_collection/bacillus_subtilis_subsp_subtilis_str_168/Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.41.gtf.gz</span>
-<span id="cb17-3"><a href="#cb17-3"></a></span>
-<span id="cb17-4"><a href="#cb17-4"></a><span class="co">## Uncompress genome annotations for the organism of interest</span></span>
-<span id="cb17-5"><a href="#cb17-5"></a><span class="fu">gunzip</span> -f Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.41.gtf.gz</span>
-<span id="cb17-6"><a href="#cb17-6"></a></span>
-<span id="cb17-7"><a href="#cb17-7"></a><span class="co">## Download protein sequeces for query organism</span></span>
-<span id="cb17-8"><a href="#cb17-8"></a><span class="fu">wget</span> --no-clobber ftp://ftp.ensemblgenomes.org/pub/release-41/bacteria//fasta/bacteria_0_collection/bacillus_subtilis_subsp_subtilis_str_168/pep/Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.pep.all.fa.gz</span>
-<span id="cb17-9"><a href="#cb17-9"></a></span>
-<span id="cb17-10"><a href="#cb17-10"></a><span class="co">## Uncompress protein sequences for the organism of interest</span></span>
-<span id="cb17-11"><a href="#cb17-11"></a><span class="fu">gunzip</span> -f Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.pep.all.fa.gz</span>
-<span id="cb17-12"><a href="#cb17-12"></a></span>
-<span id="cb17-13"><a href="#cb17-13"></a><span class="co">## Check the result files</span></span>
-<span id="cb17-14"><a href="#cb17-14"></a><span class="fu">ls</span> -l Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1*</span>
-<span id="cb17-15"><a href="#cb17-15"></a></span>
-<span id="cb17-16"><a href="#cb17-16"></a></span>
-<span id="cb17-17"><a href="#cb17-17"></a><span class="co">## Format the blas database for the organism of interest</span></span>
-<span id="cb17-18"><a href="#cb17-18"></a><span class="ex">makeblastdb</span> -in Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.pep.all.fa -dbtype  prot</span></code></pre></div>
-</div>
-</div>
-<div id="identifying-aspartokinase-homologs-in-the-proteome-of-interest" class="section level2">
-<h2>Identifying aspartokinase homologs in the proteome of interest</h2>
-<p>To identify homologs for a given protein, we can run a simple blastp search against the proteome of the organism of interest (in my case, <em>Bacillus subtilis</em>).</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1"></a><span class="ex">blastp</span> \</span>
-<span id="cb18-2"><a href="#cb18-2"></a>  -db Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.pep.all.fa \</span>
-<span id="cb18-3"><a href="#cb18-3"></a>  -query P08660.fasta \</span>
-<span id="cb18-4"><a href="#cb18-4"></a>  <span class="op">&gt;</span> lysC_vs_Bacillus_subtilis.txt</span>
-<span id="cb18-5"><a href="#cb18-5"></a>  </span>
-<span id="cb18-6"><a href="#cb18-6"></a><span class="ex">blastp</span> -outfmt 7\</span>
-<span id="cb18-7"><a href="#cb18-7"></a>  -db Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.pep.all.fa \</span>
-<span id="cb18-8"><a href="#cb18-8"></a>  -query P08660.fasta \</span>
-<span id="cb18-9"><a href="#cb18-9"></a>  <span class="op">&gt;</span> lysC_vs_Bacillus_subtilis_outfmt7.tsv</span>
-<span id="cb18-10"><a href="#cb18-10"></a>  </span></code></pre></div>
-<p>However this would return many false positives, since BLAST sets its default E-value to 10 (we thus expect ~10 false positives on average for such a search). To avoid this, blastp enables to control the expected number of false positives with a threshold on the E-value, using the option <code>-evalue</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1"></a><span class="ex">blastp</span>  -evalue 0.00001 \</span>
-<span id="cb19-2"><a href="#cb19-2"></a>  -db Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.pep.all.fa \</span>
-<span id="cb19-3"><a href="#cb19-3"></a>  -query P08660.fasta \</span>
-<span id="cb19-4"><a href="#cb19-4"></a>  <span class="op">&gt;</span> lysC_vs_Bacillus_subtilis_eval0.00001.txt</span>
-<span id="cb19-5"><a href="#cb19-5"></a></span>
-<span id="cb19-6"><a href="#cb19-6"></a><span class="co">## Check the alignments of aspartokinase homologs</span></span>
-<span id="cb19-7"><a href="#cb19-7"></a><span class="fu">less</span> lysC_vs_Bacillus_subtilis_eval0.00001.txt</span>
-<span id="cb19-8"><a href="#cb19-8"></a></span>
-<span id="cb19-9"><a href="#cb19-9"></a><span class="ex">blastp</span> -evalue 0.00001 -outfmt 7 \</span>
-<span id="cb19-10"><a href="#cb19-10"></a>  -db Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.pep.all.fa \</span>
-<span id="cb19-11"><a href="#cb19-11"></a>  -query P08660.fasta \</span>
-<span id="cb19-12"><a href="#cb19-12"></a>  <span class="op">&gt;</span> lysC_vs_Bacillus_subtilis_eval0.00001_outfmt7.tsv</span>
-<span id="cb19-13"><a href="#cb19-13"></a></span>
-<span id="cb19-14"><a href="#cb19-14"></a><span class="co">## Check the matching statistics for the aspartokinase homologs</span></span>
-<span id="cb19-15"><a href="#cb19-15"></a><span class="fu">cat</span> lysC_vs_Bacillus_subtilis_eval0.00001_outfmt7.tsv</span></code></pre></div>
-<div id="interpretation-of-the-result" class="section level4">
-<h4>Interpretation of the result</h4>
-<p>Note the strong reduction of the number of hits. By setting a stringent threshold of the e-value, we retained only the most significant hits. It is worth checking the other matching statistics, in particular the alignment length and the percentage of identical aminoacids: the threshold on e-value indirectly led to select the large alignments with a high percentage of identities (because these combined conditions are required to achieve a good statistical significance).</p>
-<p>We can now check the function of the hits on the Uniprot database (<a href="http://uniprot.org" class="uri">http://uniprot.org</a>).</p>
-<p>Here is a link to the three proteins found in <em>Bacillus subtlis</em>:</p>
-<p><a href="https://www.uniprot.org/uniprot/?query=cab14807+OR+CAB12187+OR+CAB13549" class="uri">https://www.uniprot.org/uniprot/?query=cab14807+OR+CAB12187+OR+CAB13549</a></p>
-<p>What is the function of these proteins? In which pathways are these involved?</p>
-<p>We can also try to understand the role of these aspartokinases by visualizing their place in metabolic pathwauys annotated in the BioCyc database.</p>
-<p><a href="https://biocyc.org/BSUB/NEW-IMAGE?type=PATHWAY&amp;object=PWY-2941" class="uri">https://biocyc.org/BSUB/NEW-IMAGE?type=PATHWAY&amp;object=PWY-2941</a></p>
-</div>
-</div>
-<div id="all-proteins-of-b.subtilis-against-all-proteins-of-e.-coli" class="section level2">
-<h2>All proteins of <em>B.subtilis</em> against all proteins of <em>E. coli</em></h2>
-<div id="proteome-wise-similarity-search" class="section level3">
-<h3>Proteome-wise similarity search</h3>
-<ol style="list-style-type: decimal">
-<li><p>Write a command that searches for similarities for all proteins of your proteome of interest against all proteins of <em>E. coli</em>, and prints the output in tab-delimited format with comment lines. Save the output in a file named <code>[your_organism]__vs__Escherichia_coli_blastp_outfmt7.tsv</code> (relpace <code>[your_organism]</code> by the actual name of the organism you selected for this tutorial).</p></li>
-<li><p>Use <code>grep</code> to select the non-comment lines and store them in a separate file named <code>[your_organism]__vs__Escherichia_coli_blastp_table.tsv</code>.</p></li>
-</ol>
-<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1"></a><span class="co">## Note : we prepend the command &quot;time&quot; to measure the computation time, just for the sake of curiosity</span></span>
-<span id="cb20-2"><a href="#cb20-2"></a><span class="bu">time</span> blastp -outfmt 7 \</span>
-<span id="cb20-3"><a href="#cb20-3"></a>  -db Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa  \</span>
-<span id="cb20-4"><a href="#cb20-4"></a>  -query Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.pep.all.fa \</span>
-<span id="cb20-5"><a href="#cb20-5"></a>  <span class="op">&gt;</span> Bacillus_subtilis__vs__Escherichia_coli_blastp_outfmt7.tsv</span>
-<span id="cb20-6"><a href="#cb20-6"></a></span>
-<span id="cb20-7"><a href="#cb20-7"></a><span class="co">## Create a separate file without comments</span></span>
-<span id="cb20-8"><a href="#cb20-8"></a><span class="fu">grep</span> -v <span class="st">&#39;^#&#39;</span> Bacillus_subtilis__vs__Escherichia_coli_blastp_outfmt7.tsv <span class="op">&gt;</span> Bacillus_subtilis__vs__Escherichia_coli_blastp_table.tsv  </span>
-<span id="cb20-9"><a href="#cb20-9"></a></span>
-<span id="cb20-10"><a href="#cb20-10"></a><span class="co">## Count the number of hits</span></span>
-<span id="cb20-11"><a href="#cb20-11"></a><span class="fu">wc</span> -l Bacillus_subtilis__vs__Escherichia_coli_blastp_table.tsv  </span></code></pre></div>
-<p>This search was realized with the default threshold on the E-value. The results is thus likely to includes <em>a lot of false positives</em>, since the default E-value for blastp is 10 ! For proteome-wise searches, one generally uses much more stringent threshold in order to only report highly significant matches.</p>
-</div>
-<div id="selecting-significant-hits" class="section level3">
-<h3>Selecting significant hits</h3>
-<ol start="4" style="list-style-type: decimal">
-<li><p>Run blast with a threshold of <span class="math inline">\(10^{-5}\)</span> on the E-value and store the result in a separate file, in tabular format and <em>without comments</em>.</p>
-<p><strong>Note</strong>: we now discard the commands because this file will further be used to sort the hits by E-value.</p></li>
-</ol>
-<pre class="blast"><code>## Note : we prepend the command &quot;time&quot; to measure the computation time, just for the sake of curiosity
-time blastp -outfmt 6 -evalue 0.00001 \
-  -db Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.pep.all.fa  \
-  -query Bacillus_subtilis_subsp_subtilis_str_168.ASM904v1.pep.all.fa \
-  &gt; Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv
-
-## Count the number of hits
-wc -l Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv</code></pre>
-</div>
-<div id="counting-the-number-of-hits-per-protein" class="section level3">
-<h3>Counting the number of hits per protein</h3>
-<p>We can count the number of hits for each protein by combining a few unix commands: <code>cut</code>, <code>sort</code> and <code>uniq</code>. To this purpose, we will progressively build a single unix command line that chains these tools with the pipe symbol <code>|</code>, which sends the output of one unix command as input for the next one.</p>
-<p>We will first cut the column containing the IDs of the proteins in the query proteome.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1"></a><span class="co">## Identify  the column containing the ID of the hits in the proteome of interest</span></span>
-<span id="cb22-2"><a href="#cb22-2"></a><span class="fu">head</span> Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv</span>
-<span id="cb22-3"><a href="#cb22-3"></a></span>
-<span id="cb22-4"><a href="#cb22-4"></a><span class="co">## Cut the first column (containing the ID of the hits in the query proteome)</span></span>
-<span id="cb22-5"><a href="#cb22-5"></a><span class="fu">cut</span> -f 1 Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv <span class="kw">|</span> <span class="fu">more</span></span>
-<span id="cb22-6"><a href="#cb22-6"></a></span>
-<span id="cb22-7"><a href="#cb22-7"></a><span class="co">## Count the number of hits</span></span>
-<span id="cb22-8"><a href="#cb22-8"></a><span class="fu">cut</span> -f 1 Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv <span class="kw">|</span> <span class="fu">wc</span> -l</span></code></pre></div>
-<p>We will now count the number of unique hits. For this we use the command sort with the argument -u (unique).</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">cut</span> -f 1 Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv <span class="kw">|</span> <span class="fu">sort</span> -u <span class="kw">|</span> <span class="fu">wc</span> -l</span></code></pre></div>
-<p>We see that there are much less unique IDs than the total number of hits. However this does not yet tell us how many hits were found for each particular protein.</p>
-<p>The program <code>uniq</code> suppresses redundant rows in a file. Combining <code>sort</code> and <code>uniq</code> has the same effect as using <code>sort -u</code>. Check by yourself.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1"></a><span class="fu">cut</span> -f 1 Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="kw">|</span> <span class="fu">wc</span> -l</span></code></pre></div>
-<p>In addition, the program <code>uniq</code> contains an option <code>-c</code> enabling to report the number of occurrences of each row. Since we first used the <code>cut</code> command to obtain the column containing the protein IDs, each row analysed here corresponds to an ID of the query proteome. The command this counds the number of occurrences of each query protein in the blastp result file, which corresponds to its number of hits in the reference genome.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">cut</span> -f 1 Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> -c <span class="kw">|</span> <span class="fu">less</span></span></code></pre></div>
-<p>We can now use the command <code>sort</code> (a second time in the same chain of commands) in order to sort the protein IDs by decreasing number of hits.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1"></a><span class="fu">cut</span> -f 1 Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> -c <span class="kw">|</span><span class="fu">sort</span> -nr -k 1 <span class="kw">|</span> <span class="fu">less</span></span></code></pre></div>
-<p>Finally, we select the 10 first rows with the command <code>head</code>.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">cut</span> -f 1 Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> -c <span class="kw">|</span><span class="fu">sort</span> -nr -k 1 <span class="kw">|</span> <span class="fu">head</span> -n 10</span></code></pre></div>
-<div id="interpretation-of-the-results" class="section level4">
-<h4>Interpretation of the results</h4>
-<p>Here is a link to the <strong><a href="https://www.uniprot.org/uniprot/?query=CAB13179+OR+CAB15611+OR+CAB15144+OR+CAB12556+OR+CAB12571+OR+CAB12414+OR+CAB12368+OR+CAB15335+OR+CAB15984+OR+CAB15318+OR+CAB14327+OR+CAB12578+OR+CAB11921+OR+CAB15543+OR+CAB15020">result for B.subtilis against E.coli</a></strong></p>
-<p>Read the annotations for some of these proteins with a very high number of hits, and try to identify their common characteristics. For example:</p>
-<ul>
-<li>Are they involved in particular pathways?</li>
-<li>Are they exerting particular molecular activities/functions?</li>
-<li>Are they located in particular cell compartments?</li>
-<li>Do they belong to particular protein families?</li>
-</ul>
-<p>Based on this exploration of the annotations, do you understand why these proteins have so many hits?</p>
-</div>
-</div>
-<div id="sorting-hits-by-significance" class="section level3">
-<h3>Sorting hits by significance</h3>
-<p>We will now try to sort the hits by increasing E-value, in order to display the most significant hits n first place. For this, the simplest solution seems to use <code>sort</code> and specify a numeric sorting (option <code>-n</code>) on the numeric value of the <span class="math inline">\(11^{th}\)</span> column (option <code>-k 11</code>), which contains the E-value. More precisely, we will specify <code>-k 11,11</code> to sort on this column only, because the option <code>-k 11</code> would use the <span class="math inline">\(11^{th}\)</span> and all the subsequent columns as sorting keys. Let us look at the result.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1"></a><span class="co">## A first attempt to sort by E-value, not very convincint !</span></span>
-<span id="cb28-2"><a href="#cb28-2"></a><span class="fu">sort</span> -k 11,11 -n Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv <span class="kw">|</span> <span class="fu">less</span> </span></code></pre></div>
-<p>Go down by a few pages by pressing the space bar, and pay a particular attention to the 11th column, which contains the E-value. Is the sorting correct ?</p>
-<pre><code>**Note: after hacing seen the result, type &quot;q&quot;** to quit `less`.</code></pre>
-<p>The first rows contain hits with an E-value of 0. This does not properly speaking correspond to a null risk of false posiives, since there is a very small but non-null probability to observe a hit by chance, even if two proteins are very similar to each other. For blast, a <span class="math inline">\(0\)</span> value in the <span class="math inline">\(11^{th}\)</span> column indicates that the E-value is below the precision limit of computation, which is approximately <span class="math inline">\(1e-182\)</span>. <em>E-values of 0 should thus be interpreted as “smaller than <span class="math inline">\(10^{-182}\)</span>”.</em></p>
-<p>At the transition between 0 E-values and non-zero E-values, you will notice that the sorting is incorrect. Here is the result we obtain with <em>Bacillus subtilis</em>.</p>
-<pre><code>...
-CAB16047        AAC73707        56.673  517     ...   517     0.0     585
-CAB16048        AAC75939        65.828  477     ...   479     0.0     676
-CAB16138        AAC76764        52.564  624     ...   629     0.0     635
-CAB11917        AAC76323        56.034  116     ...   116     1.00e-47        146
-CAB12080        AAC76505        28.638  213     ...   229     1.00e-21        87.8
-CAB12153        AAC73552        26.360  239     ...   564     1.00e-12        64.3
-CAB12183        AAC73788        34.934  229     ...   223     1.00e-36        125
-CAB12414        AAC74372        26.061  165     ...   195     1.00e-07        50.4
-CAB12414        AAC76505        24.895  237     ...   223     1.00e-13        68.9
-CAB12437        AAC74386        29.075  227     ...   220     1.00e-13        65.1
-CAB12735        AAC76480        22.707  229     ...   242     1.00e-13        65.5
-...</code></pre>
-<p>Why are the E-values not sorted correctly? Apparently, the Unix <code>sort</code> command does not support the scientific notation, and thus mis-handles numbers like 1.00e-36 or 1.00e-12.</p>
-<p>To solve this, people use different tricks. Mine is to use <code>awk</code> in order to add a column with a significance score, which I define as the minus log of the E-value.</p>
-<p><span class="math display">\[sig = -log_{10}(\text{Evalue})\]</span></p>
-<p>I do a double transformation, to replace infinite values (resulting from null E-values, since <span class="math inline">\(-log_{10}(0) = \text{-inf}\)</span>) by a number, which I arbitrarily set to <span class="math inline">\(200\)</span> (higher than the 182).</p>
-<p><strong>Note</strong>: by default, the <code>log()</code> function computes natural logarithms. Base 10 logarithms can be computed easily by dividing the result by the natural logarithm of 10.</p>
-<p><span class="math display">\[log_{10}(x) = log_e(x) / log_e(10)\]</span></p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1"></a><span class="co">## Sort BLAST hits on a column with significance, computed with awk</span></span>
-<span id="cb31-2"><a href="#cb31-2"></a><span class="fu">awk</span> <span class="st">&#39;{sig= -log($11) / log(10); print $0&quot;\t&quot; sig}&#39;</span> \</span>
-<span id="cb31-3"><a href="#cb31-3"></a>  Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv \</span>
-<span id="cb31-4"><a href="#cb31-4"></a>  <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{ sub(&quot;inf&quot;, &quot;200&quot;); print }&#39;</span> \</span>
-<span id="cb31-5"><a href="#cb31-5"></a>  <span class="kw">|</span> <span class="fu">sort</span> -k 13,13 -n -r \</span>
-<span id="cb31-6"><a href="#cb31-6"></a>  <span class="kw">|</span> <span class="fu">less</span> </span></code></pre></div>
-</div>
-<div id="sorting-hits-by-significance-bit-score" class="section level3">
-<h3>Sorting hits by significance + bit score</h3>
-<p>Adapt the above command to sort on a double key:</p>
-<pre><code>- Primary key: decreasing significance (as computed above) 
-- Secondary key: decreasing bit score (the $12^{th}$ column of BLAST output)</code></pre>
-<p>Store the result in a file named <code>[your_organism]__vs__Escherichia_coli_blastp_sorted.tsv</code></p>
-<div id="solution-5" class="section level4">
-<h4>Solution</h4>
-<div class="sourceCode" id="cb33"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1"></a><span class="co">## Define an environment variable with the name of the sorted hits (this will be useful for further processing)</span></span>
-<span id="cb33-2"><a href="#cb33-2"></a><span class="va">BLAST_HITS_SORTED=</span>Bacillus_subtilis__vs__Escherichia_coli_blastp_sorted.tsv</span>
-<span id="cb33-3"><a href="#cb33-3"></a></span>
-<span id="cb33-4"><a href="#cb33-4"></a><span class="co">## Sort BLAST hits by decreasing significance and decreasing bit score</span></span>
-<span id="cb33-5"><a href="#cb33-5"></a><span class="fu">awk</span> <span class="st">&#39;{sig= -log($11) / log(10); print $0&quot;\t&quot; sig}&#39;</span> \</span>
-<span id="cb33-6"><a href="#cb33-6"></a>  Bacillus_subtilis__vs__Escherichia_coli_blastp_eval0.00001.tsv \</span>
-<span id="cb33-7"><a href="#cb33-7"></a>  <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{ sub(&quot;inf&quot;, &quot;200&quot;); print }&#39;</span> \</span>
-<span id="cb33-8"><a href="#cb33-8"></a>  <span class="kw">|</span> <span class="fu">sort</span> -k 13,13 -k 12,12 -n -r \</span>
-<span id="cb33-9"><a href="#cb33-9"></a>  <span class="op">&gt;</span> <span class="va">${BLAST_HITS_SORTED}</span></span>
-<span id="cb33-10"><a href="#cb33-10"></a>  </span>
-<span id="cb33-11"><a href="#cb33-11"></a><span class="co">## Check the result</span></span>
-<span id="cb33-12"><a href="#cb33-12"></a><span class="fu">less</span> <span class="va">${BLAST_HITS_SORTED}</span></span></code></pre></div>
-</div>
-</div>
-<div id="computing-blast-hit-ranks" class="section level3">
-<h3>Computing blast hit ranks</h3>
-<p>Starting from the sorted blast hits, compute</p>
-<pre><code>- a rank of the hits according to the query protein (`qrank`),
-- another rank according to the &quot;subject&quot; protein (`srank`), i.e. the protein found in the blast database of your reference organism. </code></pre>
-<p><strong>Definition</strong>: by <strong><em>Best hit</em></strong> we mean the most significant alignment, i.e. the alignment with the smallest E-value. In case of identical E-values, the bit score is used as secondary ranking criterion, as we did above.</p>
-<p><strong>Tip</strong>: <code>awk</code> enables to compute ranks by incrementing a counter at each occurrence of a given value (e.g. a protein identifier) in a given column (e.g. the first column, which contains query protein IDs).</p>
-<p>The following command adds a column to the sorted blast hits, indicating the occurrence number of each value of the first column. Since our file is sorted by E-value, this corresponds to the rank of the hits according to the query sequences (we therefore name the variable <code>qrank</code>).</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1"></a><span class="fu">awk</span> <span class="st">&#39;{ qrank[$1]++ ; print $0&quot;\t&quot;qrank[$1]}&#39;</span>  <span class="va">${BLAST_HITS_SORTED}</span> <span class="kw">|</span> <span class="fu">less</span></span></code></pre></div>
-<p>We can now complete this command by computing a second variable which indicates the rank of each hit according to the “subject”" sequence (<code>srank</code>), i.e. the sequence of the blast database.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1"></a><span class="va">BLAST_HITS_RANKED=</span>Bacillus_subtilis__vs__Escherichia_coli_blastp_ranks.tsv</span>
-<span id="cb36-2"><a href="#cb36-2"></a><span class="fu">awk</span> <span class="st">&#39;{ qrank[$1]++ ; srank[$2]++ ; print $0&quot;\t&quot;qrank[$1]&quot;\t&quot;srank[$2]}&#39;</span> \</span>
-<span id="cb36-3"><a href="#cb36-3"></a>  <span class="va">${BLAST_HITS_SORTED}</span> <span class="op">&gt;</span> <span class="va">${BLAST_HITS_RANKED}</span></span>
-<span id="cb36-4"><a href="#cb36-4"></a>  </span>
-<span id="cb36-5"><a href="#cb36-5"></a><span class="co">## Check the result</span></span>
-<span id="cb36-6"><a href="#cb36-6"></a><span class="fu">less</span> <span class="va">${BLAST_HITS_RANKED}</span></span></code></pre></div>
-<p><strong><em>less does more or less the same as more</em></strong></p>
-<p>With the <code>less</code> command, you can browse the content by pressing the space bar in order to see the next “page”. In the beginning of the file, most ranks are 1 in the two last columns, because the very low E-values generally correspond to the bidirectional best hit. As you go down, you will notice some hits with larger rank values for the <code>srank</code> and <code>qrank</code> columns, indicating that the query or subject sequences have multiple hits.</p>
-</div>
-<div id="finding-best-hits" class="section level3">
-<h3>Finding best hits</h3>
-<p>With the ranked blast hits, use the <code>awk</code> command to select:</p>
-<pre><code>- the best hit for each protein of the query organism (query BH);
-- the best hit for each protein of the reference organism (subject BH);
-- the bidirectional best hit (BBH)</code></pre>
-<p>Save each result in a separate file, and count the number of hits in each file.</p>
-<div id="solution-6" class="section level4">
-<h4>Solution</h4>
-<div class="sourceCode" id="cb38"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1"></a></span>
-<span id="cb38-2"><a href="#cb38-2"></a><span class="co">## Best hits per query sequence</span></span>
-<span id="cb38-3"><a href="#cb38-3"></a><span class="va">BLAST_QUERY_BH=</span>Bacillus_subtilis__vs__Escherichia_coli_blastp_query_BH.tsv</span>
-<span id="cb38-4"><a href="#cb38-4"></a><span class="fu">awk</span> <span class="st">&#39;$14 == 1&#39;</span> <span class="va">${BLAST_HITS_RANKED}</span> <span class="op">&gt;</span> <span class="va">${BLAST_QUERY_BH}</span></span>
-<span id="cb38-5"><a href="#cb38-5"></a></span>
-<span id="cb38-6"><a href="#cb38-6"></a><span class="co">## Best hits per subject sequence</span></span>
-<span id="cb38-7"><a href="#cb38-7"></a><span class="va">BLAST_SUBJECT_BH=</span>Bacillus_subtilis__vs__Escherichia_coli_blastp_subject_BH.tsv</span>
-<span id="cb38-8"><a href="#cb38-8"></a><span class="fu">awk</span> <span class="st">&#39;$15 == 1&#39;</span> <span class="va">${BLAST_HITS_RANKED}</span> <span class="op">&gt;</span> <span class="va">${BLAST_SUBJECT_BH}</span></span>
-<span id="cb38-9"><a href="#cb38-9"></a></span>
-<span id="cb38-10"><a href="#cb38-10"></a><span class="co">## Bidirectional best hits</span></span>
-<span id="cb38-11"><a href="#cb38-11"></a><span class="va">BLAST_BBH=</span>Bacillus_subtilis__vs__Escherichia_coli_blastp_BBH.tsv</span>
-<span id="cb38-12"><a href="#cb38-12"></a><span class="fu">awk</span> <span class="st">&#39;$14 == 1 &amp;&amp; $15 == 1&#39;</span> <span class="va">${BLAST_HITS_RANKED}</span> <span class="op">&gt;</span> <span class="va">${BLAST_BBH}</span></span>
-<span id="cb38-13"><a href="#cb38-13"></a></span>
-<span id="cb38-14"><a href="#cb38-14"></a><span class="co">## Count number of best hits</span></span>
-<span id="cb38-15"><a href="#cb38-15"></a><span class="fu">wc</span> -l  <span class="va">${BLAST_QUERY_BH}</span> <span class="va">${BLAST_SUBJECT_BH}</span> <span class="va">${BLAST_BBH}</span></span></code></pre></div>
-</div>
-</div>
-</div>
-<div id="all-proteins-from-e.-coli-versus-e.-coli" class="section level2">
-<h2>All proteins from E. coli versus E. coli</h2>
-<p><strong>Exercise: </strong> build a command that compares the sequences of all the E.coli proteins against each other, and store the results in a tab-delimited file with a single line per hit (we do not need the alignments).</p>
-</div>
-</div>
-<div id="devoir-maison" class="section level1">
-<h1>Devoir-maison</h1>
-<div id="informations" class="section level2">
-<h2>Informations</h2>
-<ul>
-<li><p>Ce devoir-maison peut être réalisé en combinant quelques commandes en ligne (<code>cut</code>, <code>grep</code>, <code>awk</code>, <code>sort</code>, <code>uniq</code>, <code>wc</code>, <code>diff</code>) et l’outil bioinformatique <code>blastp</code>.</p>
-<p>Nous vous recommandons de lire les manuels de ces commandes, ou de consulter quelques tutoriels. En particulier, il sera utile de connaître la syntaxe de <code>awk</code> pour manipuler des chaînes de caractères (substitution, impression de colonnes sélectionnées) et pour numéroter les lignes. On trouve par exemple des informations ici: <a href="http://www.catonmat.net/blog/awk-one-liners-explained-part-two/" class="uri">http://www.catonmat.net/blog/awk-one-liners-explained-part-two/</a>.</p></li>
-<li><p>Le rendu de ce TP inclut un <strong>script bash</strong> rédigé de façon à être compréhensible par un lecteur non averti (commentez le code, nommez les variables de façon indicative, …). Ce script devra également être paramétrisable pour analyser d’autres organismes que le vôtre. A cette fin, définissez dès le début des variables pour les organismes d’intérêt (<code>QUERY_ORG</code>) et de référence (<code>REF_ORG</code>), ains que pour les noms de fichiers d’input et output. En principe l’enseignant devra pouvoir refaire tourner toutes vos analyses à partir de votre script.</p></li>
-<li><p>La seconde pièce du rendu sera un <strong>rapport d’interprétation</strong> synthétique.</p></li>
-<li><p>Ci-dessous (et dans votre rapport) nous désignerons les hits avec une E-valeur inférieure à 1e-5 comme <em>“homologues prédits”</em> ou plus simplement <em>“homologues”</em>.</p></li>
-</ul>
-</div>
-<div id="modèle-de-rapport" class="section level2">
-<h2>Modèle de rapport</h2>
-<p>Je fournis ci-dessous 2 modèles de rapport pour le devoir-maison du TP proteome BLAST.</p>
-<ul>
-<li><p>Format docx (peut s’ouvrir avec LibreOffice ou avec un éditeur de texte commercial).</p></li>
-<li><p><em>Pour les geeks</em>: un fichier R markdown (extension Rmd), que j’ai utilisé pour générer le modèle de rapport docs. Ce fichier Rmd peut être édité et compilé avec RStudio de façon relativement intuitive, pour produire un rapport HTML, pdf ou docx. Comme vous n’avez pas encore eu l’occasion d’apprendre R markdown, il n’y a aucune obligation à utiliser ce format, mais je vous le fournis déjà pour ceux qui seraient tentés de se lancer. Si c’est votre cas, soumettez à la fois le fichier Rmd et le résultat de votre compilation (html, word ou docx).</p></li>
-<li><p>Modèle de rapport: <a href="blast_proteome_rapport-TP_NOM_Prenom.docx">docx</a> <a href="blast_proteome_rapport-TP_NOM_Prenom.Rmd">Rmd</a></p></li>
-</ul>
-</div>
-<div id="questions-2" class="section level2">
-<h2>Questions</h2>
-<ol style="list-style-type: decimal">
-<li><p>Faites tourner blast pour toutes les protéines de votre organisme d’intérêt contre toutes celles de E.coli, en sélectionnant un fichier de sortie tabulaire sans commentaires, et un seuil de <span class="math inline">\(10^{-5}\)</span> sur la E-valeur. Triez les hits par signiticativité (clé primaire) et par bit score (clé secondaire), puis calculez les rangs des hits en fonction des séquences “query” et “subject” comme nous l’avons fait dans le tutoriel.</p></li>
-<li><p>Comptez</p>
-<ul>
-<li>le nombre total de hits</li>
-<li>le nombre total de paires de protéines avec un hit</li>
-<li>le nombre de protéines de votre ortanisme d’intérêt ayant au moins un hit chez <em>E.coli</em></li>
-<li>le nombre de protéines d’<em>E.coli</em> pour lesquelles au moins un hit a été trouvé à partir de votre organisme d’intérêt</li>
-<li>le nombre de best hits pour l’organisme d’intérêt</li>
-<li>le nombre de best hits pour l’organisme de référence (<em>E.coli</em>)</li>
-<li>le nombre de best hits bidirectionnels</li>
-</ul></li>
-<li><p>Générez un fichier qui indique le nombre d’homologues prédits par protéine de l’organisme d’intérêt. Ce fichier contiendra une ligne par protéine, et deux colonnes, indiquant respectivement le nombre de hits et l’ID de la protéine (<code>uniq -c</code>). Triez les résultats par nombre décroissant de hits (les protéines ayant le plus grand nombre de hits s’affichent en premier lieu). Afficher les 10 premières lignes du fichier.</p></li>
-</ol>
-<p><strong><em>Question d’interprétation</em></strong> : Utilisez Uniprot pour savoir quelle est la fonction biologique des protéines présentant un très grand nombre de hits. Cette fonction permet-elle de comprendre ce nombre excessif de hits ?</p>
-<ol start="4" style="list-style-type: decimal">
-<li>Calculez le nombre de protéines de l’organisme d’intérêt sans homologue prédit.</li>
-</ol>
-<p><strong><em>Question d’interprétation</em></strong> : Comment interprétez-vous ces protéines sans hit ?</p>
-<ol start="5" style="list-style-type: decimal">
-<li>Calculer la distribution du nombre d’homologues par protéine (combien de protéines ont 0, 1, 2, 3, … homologues).</li>
-</ol>
-<p><strong><em>Question d’interprétation</em></strong> : quel est le nombre moyen de hits ? Combien de protéines ont un seul hit ? Comment interpréteriez-vous ces deux nombres en termes évolutifs ?</p>
-<ol start="6" style="list-style-type: decimal">
-<li>Identifiez dans les deux comparaisons (votre organisme vs <em>E.coli</em> et <em>E.coli</em> vs votre organisme) toutes les homologies concernant des aspartokinase. Sur base de la règle du bidirectional best hit, tentez d’établir les relations d’orthologie et de paralogie entre chaque paire de protéines, et représentez les résultats dans un tableau avec les gènes de votre organisme sur les lignes, les gènes de E.coli sur les colonnes, et en indiquant “P”, “O”, ou “I” pour paralogie, orthologie ou identité, respectivement.</li>
-</ol>
-<p><strong><em>Question d’interprétation</em></strong> : comment interprétez-vous ces résultats en terme de voies métaboliques ? N’hésitez pas à constuler des ressources complémentaires (KEGG, MetaCyc, …).</p>
-<div id="question-bonus-pour-les-acharnés" class="section level3">
-<h3>Question bonus pour les acharnés</h3>
-<ol style="list-style-type: decimal">
-<li><p>Utilisez le programme <code>shuffleseq</code> pour permuter les séquences de votre organisme d’intérêt, et effectuez les mêmes analyses avec ces séquences aléatoires. Comparez les résultats et ceux obtenus avec le protéome de votre organisme d’intérê.</p></li>
-<li><p>Comparez le protéome de <em>E.coli</em> à lui-même et calculez les nombres de hits.</p></li>
-<li><p>Utilisez votre script pour effectuer les analyses dans l’autre sens, en inversant les noms d’organismes d’intérêt (QUERY_ORG) et de référence (REF_ORG).</p></li>
-</ol>
 <hr />
 </div>
 </div>
 </div>
+<div id="homework" class="section level1">
+<h1>Homework</h1>
+<hr />
+</div>
+<div id="supplementary-information-not-part-of-the-practical" class="section level1">
+<h1>Supplementary information (not part of the practical)</h1>
+<div id="installing-the-conda-environment-in-your-own-computer" class="section level2">
+<h2>Installing the conda environment in your own computer</h2>
+<p><strong>Attention</strong>, this is a complement to the practical, which should not be run if you are working on the IFB core cluster. This section explains you how to install on your environment all the tools required for this tutorial.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="co">## </span><span class="al">ATTENTION</span><span class="co">: DO NOT RUN THIS COMMAND IF YOU ARE ON THE NNCR CLUSTER,</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="co">## because this would occupy a big space to reinstall BLAST in your </span></span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="co">## own account, although it is already available for all users. </span></span>
+<span id="cb16-4"><a href="#cb16-4"></a></span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="co">## Check that conda is available on your computer</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="fu">which</span> conda</span>
+<span id="cb16-7"><a href="#cb16-7"></a></span>
+<span id="cb16-8"><a href="#cb16-8"></a><span class="co">## Define an environment variable with the conda bin directory</span></span>
+<span id="cb16-9"><a href="#cb16-9"></a><span class="bu">export</span> <span class="va">CONDA=</span><span class="kw">`</span><span class="fu">which</span> conda<span class="kw">`</span></span>
+<span id="cb16-10"><a href="#cb16-10"></a><span class="bu">export</span> <span class="va">CONDA_BIN=</span><span class="kw">`</span><span class="fu">dirname</span> <span class="va">$CONDA</span><span class="kw">`</span></span>
+<span id="cb16-11"><a href="#cb16-11"></a></span>
+<span id="cb16-12"><a href="#cb16-12"></a><span class="co">## Create a conda environment named blast/2.7.1 and install the corresponding blast version</span></span>
+<span id="cb16-13"><a href="#cb16-13"></a><span class="ex">conda</span> create -n blast blast==2.7.1</span>
+<span id="cb16-14"><a href="#cb16-14"></a></span>
+<span id="cb16-15"><a href="#cb16-15"></a><span class="co">## Create a conda environment named emboss/6.6.0 and install the corresponding emboss version</span></span>
+<span id="cb16-16"><a href="#cb16-16"></a><span class="ex">conda</span> create -n emboss emboss==6.6.0</span>
+<span id="cb16-17"><a href="#cb16-17"></a></span>
+<span id="cb16-18"><a href="#cb16-18"></a><span class="co">## List the conda environments available on the system</span></span>
+<span id="cb16-19"><a href="#cb16-19"></a><span class="va">$CONDA_BIN</span><span class="ex">/conda</span> env list</span>
+<span id="cb16-20"><a href="#cb16-20"></a></span>
+<span id="cb16-21"><a href="#cb16-21"></a><span class="co">## FInd the blast environment</span></span>
+<span id="cb16-22"><a href="#cb16-22"></a><span class="va">$CONDA_BIN</span><span class="ex">/conda</span> env list <span class="kw">|</span> <span class="fu">grep</span> -i blast</span>
+<span id="cb16-23"><a href="#cb16-23"></a></span>
+<span id="cb16-24"><a href="#cb16-24"></a><span class="co">## Activate the blast environment. </span></span>
+<span id="cb16-25"><a href="#cb16-25"></a><span class="ex">conda</span> activate blast</span>
+<span id="cb16-26"><a href="#cb16-26"></a></span>
+<span id="cb16-27"><a href="#cb16-27"></a><span class="co">## Check the location of the blastp command</span></span>
+<span id="cb16-28"><a href="#cb16-28"></a><span class="fu">which</span> blastp</span>
+<span id="cb16-29"><a href="#cb16-29"></a></span>
+<span id="cb16-30"><a href="#cb16-30"></a><span class="co">## Deactivate the current environment. </span></span>
+<span id="cb16-31"><a href="#cb16-31"></a><span class="ex">conda</span> deactivate</span>
+<span id="cb16-32"><a href="#cb16-32"></a><span class="co">## Note the change in the shell prompt</span></span>
+<span id="cb16-33"><a href="#cb16-33"></a></span>
+<span id="cb16-34"><a href="#cb16-34"></a><span class="co">## Re-activate the blast environment and activate the emboss environment</span></span>
+<span id="cb16-35"><a href="#cb16-35"></a><span class="ex">conda</span> activate blast</span>
+<span id="cb16-36"><a href="#cb16-36"></a><span class="ex">conda</span> activate emboss</span>
+<span id="cb16-37"><a href="#cb16-37"></a><span class="co">## Note the change in the shell prompt</span></span>
+<span id="cb16-38"><a href="#cb16-38"></a></span>
+<span id="cb16-39"><a href="#cb16-39"></a><span class="co">## Find the path of the shuffleseq command (part of the EMBOSS package)</span></span>
+<span id="cb16-40"><a href="#cb16-40"></a><span class="fu">which</span> shuffleseq</span></code></pre></div>
+<hr />
+</div>
+</div>
 <div id="references" class="section level1">
 <h1>References</h1>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The file downloaded from Uniprot has a sophisticated name with parentheses and brackets, which will be hard to handle in unix commands: <code>uniprot-organism__Drosophila+melanogaster+(Fruit+fly)+[7227]_.fasta.gz</code><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
 
 
@@ -1130,7 +818,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeCodeFolding("show" === "show");
+  window.initializeCodeFolding("hide" === "show");
 });
 </script>
 

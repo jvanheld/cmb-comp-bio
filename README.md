@@ -30,7 +30,7 @@ Note: The first course (sequence similarity search) partly overlaps with the int
 2. The practical will also introduce the way to run the analyses on a computer cluster (IFB core cluster), by sending them to a job scheduler (slurm). 
 
 | Session | Date | Topics | Type | Teaching material |
-|--------|----------------------------------|-------------|--------------|
+|-----|--------|----------------------------------|-------------|--------------|
 | 1 | 2019-11-25 | ¨**Using the IFB NNCR cluster infrastructure** |
 | | | Introduction                            | Course     | Slides [[html](slides/01_NNCR-working-environment.html)] [[Rmd](slides/01_NNCR-working-environment.Rmd)] |
 | | | IFB high performance computing usage | Practical | Slides [[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html)] |
@@ -46,13 +46,11 @@ Note: The first course (sequence similarity search) partly overlaps with the int
 | | | Detecting protein domains with HMMs     | Practical  |  |
 
 
-
 ## IFB computing infrastructure
 
 For the practicals, we will use the IFB core cluster, which currently contains 4300 cores adn 400TB storage. 
 
 **Attention**: all tasks must **imperatively** run via the `slurm` task scheduler (never run them on the login node). 
-
 
 | Resource | URL | 
 |------------------------|----------------------------------|
@@ -68,4 +66,17 @@ For the practicals, we will use the IFB core cluster, which currently contains 4
 | **Ensembl** | Genome database | [www.ensembl.org](http://www.ensembl.org/) |
 | **UniprotKB** | Knowledge base of protein sequence and functional information | [www.uniprot.org](https://www.uniprot.org/) | 
 | **PFAM** | Database of protein families | [pfam.xfam.org](https://pfam.xfam.org/) |
+
+## Supplementary teaching resources
+
+### Bioinformatics introductory course
+
+Introductory course of bioinformatics, for Bachelor students in biology. 
+
+- [Home page of the course](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro)
+- [Pairwise alignments](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.02.pairwise_alignment_slides.pdf): global (Needleman-Wunsch) and local (Smith-Waterman) algorithms using dynamical programming
+- [Sequence similarity searches with BLAST](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.03.similarity_searches_slides.pdf)
+
+
+
 
