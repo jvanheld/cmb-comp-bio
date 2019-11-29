@@ -26,20 +26,24 @@ output:
 ---
 
 
-```{r setup, include=FALSE}
-library(knitr, warn.conflicts = FALSE)
-knitr::opts_chunk$set(
-  echo = TRUE, 
-  results = TRUE, 
-  message = FALSE,
-  fig.align = "center")
+```{r setup, include=FALSE, echo=FALSE, eval=TRUE}
+library(knitr)
 
-dir.main <- "~/IFB/NNCR/using_IFB_NNCR/"
-dir.tp <- file.path(dir.main, "practicals", "")
-setwd(dir.tp)
+options(width = 300)
+knitr::opts_chunk$set(
+  fig.width = 7, fig.height = 5, 
+  fig.align = "center", 
+  fig.path = "figures/blast-protein-families_",
+  size = "tiny", 
+  echo = FALSE, eval = TRUE, 
+  warning = FALSE, message = FALSE, 
+  results = TRUE, comment = "")
+# knitr::asis_output("\\footnotesize")
+
+# dir.slides <- "~/IFB/NNCR/using_IFB_NNCR/slides/"
+# setwd(dir.slides)
 
 ```
-
 
 ********************************
 # Goals of this tutorial

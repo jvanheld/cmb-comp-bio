@@ -2,7 +2,7 @@
 title: "Infrastructure and software environment"
 subtitle: "IFB National Network of Computing Resources"
 author: "Jacques van Helden"
-date: '2019-11-24'
+date: '2019-11-28'
 output:
   slidy_presentation:
     self_contained: false

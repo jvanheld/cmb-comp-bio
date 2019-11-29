@@ -32,15 +32,16 @@ Note: The first course (sequence similarity search) partly overlaps with the int
 | Session | Date | Topics | Type | Teaching material |
 |-----|--------|----------------------------------|-------------|--------------|
 | 1 | 2019-11-25 | ¨**Using the IFB NNCR cluster infrastructure** |
-| | | Introduction                            | Course     | Slides [[html](slides/01_NNCR-working-environment.html)] [[Rmd](slides/01_NNCR-working-environment.Rmd)] |
+| | | Introduction                            | Course     | Slides [[html](slides/01_NNCR-working-environment.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/slides/01_NNCR-working-environment.Rmd)] |
 | | | IFB high performance computing usage | Practical | Slides [[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html)] |
 | | | First steps with the IFB HPC cluster | Practical | - [IFB cluster doc](https://ifb-elixirfr.gitlab.io/cluster/doc/)<br>- [Quick start](https://ifb-elixirfr.gitlab.io/cluster/doc/quick-start/) <br>- [Slurm user guide](https://ifb-elixirfr.gitlab.io/cluster/doc/slurm_user_guide/) |
 | 2  | 2019-11-25 | **Collecting sequence families by sequence alignement**      |
 | | | Sequence search by similarity      | Course     |  |
-| | | Collecting sequence families with BLAST | Practical  | [[html](practicals/blast_proteome/blast_protein-family.html)][[Rmd](practicals/blast_proteome/blast_protein-family.Rmd)] |
+| | | Collecting sequence families with BLAST | Practical  | [[html](practicals/blast_proteome/blast_protein-family.html)][[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/blast_proteome/blast_protein-family.Rmd)] |
 | 3 | 2019-11-29 | **Segmenting sequences with HMMs** |
-| | | Hidden Markov models                    | Course     |  |
-| |  | Annotating CpG islands with HMMs        | Practical  |  |
+| | | Hidden Markov Models (HMMs)             | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.05.Hidden-Markov-Models.pdf))]  |
+| | | Multiple sequence alignments and sequence motifs | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.04.multiple_alignments_slides.pdf)] |
+| |  | Analysing CpG islands with Markov models        | Practical  | [[html](practicals/markov-models/markov-models.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models.Rmd)] |
 | 4 | 2019-12-05 | **Detecting protein domains with HMMs** |
 | | | Protein domains                         | Course     |  |
 | | | Detecting protein domains with HMMs     | Practical  |  |
@@ -55,7 +56,7 @@ For the practicals, we will use the IFB core cluster, which currently contains 4
 | Resource | URL | 
 |------------------------|----------------------------------|
 | IFB NNCR cluster: info + account request | https://www.france-bioinformatique.fr/en/cluster |
-| Slides: IFB high performance computing usage |  https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html#1 |
+| Slides: using the IFB core cluster |  https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html#1 |
 | IFB cluster doc | https://ifb-elixirfr.gitlab.io/cluster/doc/<br>- [Quick start](https://ifb-elixirfr.gitlab.io/cluster/doc/quick-start/) <br>- [Slurm user guide](https://ifb-elixirfr.gitlab.io/cluster/doc/slurm_user_guide/) | 
 
 
