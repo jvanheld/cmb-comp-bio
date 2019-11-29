@@ -31,12 +31,15 @@ library(knitr)
 
 options(width = 300)
 knitr::opts_chunk$set(
-  fig.width = 7, fig.height = 5, 
+  fig.width = 7, 
+  fig.height = 5, 
   fig.align = "center", 
   fig.path = "figures/blast-protein-families_",
   size = "tiny", 
-  echo = FALSE, eval = TRUE, 
-  warning = FALSE, message = FALSE, 
+  # echo = FALSE, 
+  eval = TRUE, 
+  warning = FALSE, 
+  message = FALSE, 
   results = TRUE, comment = "")
 # knitr::asis_output("\\footnotesize")
 
@@ -365,6 +368,21 @@ less P02299_blastp_result.txt
 7. For each of these putative homologs, is it a paralog, ortholog or "other log"?
 8. Do you see a relationship between the E-value and some properties of the alignments?
 
+
+## Setting a conservative cutoff on the e-value
+
+```{bash blastp_evalue, eval=FALSE}
+## Search similarities for histone 3 in D.melanogaster proteome
+srun blastp \
+  -db Drosophila_melanogaster_proteome.fasta  \
+  -query P02299.fasta -evalue 1e-5 \
+  > P02299_blastp_result_eval1e-5.txt
+  
+## Check the result
+less P02299_blastp_result_eval1e-5.txt
+```
+
+
 ## Getting a tabular synthesis of blast results
 
 By default, BLAST displays the detailed results of a similaty search, starting with a summary of the matches, followed by all the alignemnts. It can be convenient to generate a synthetic result indicating only the relevant statistics for each alignment. This can be done by tuning  BLAST options. 
@@ -427,7 +445,8 @@ which shuffleseq
 shuffleseq -h
 
 ## Shuffle the apartokinase 3 sequence
-srun shuffleseq -sequence P02299.fasta -outseq shuffled_P02299.fasta
+srun shuffleseq -sequence P02299.fasta \
+   -outseq shuffled_P02299.fasta
 
 ## Check the result
 cat shuffled_P02299.fasta
@@ -457,6 +476,7 @@ KVYERGAKAKQTRRLR
 ### Solution
 
 ```{bash eval=FALSE}
+
 ## Run blast with the shuffled lysC sequence against all D.melanogaster proteins
 srun blastp \
   -db Drosophila_melanogaster_proteome.fasta  \
@@ -466,14 +486,22 @@ srun blastp \
 ## Check the result
 less shuffled_P02299_blastp_result.txt
 
+## Re-shuffle the apartokinase 3 sequence
+srun shuffleseq -sequence P02299.fasta \
+   -outseq shuffled_P02299.fasta
+
 ## Run the same query with a tabular output
 blastp -outfmt 7 \
   -db Drosophila_melanogaster_proteome.fasta  \
   -query shuffled_P02299.fasta \
   > shuffled_P02299_blastp_summary.tsv
 
+## count the number of false positives
+wc -l shuffled_P02299_blastp_summary.tsv
+
 ## Check the result
 less shuffled_P02299_blastp_summary.tsv
+
 ```
 
 
