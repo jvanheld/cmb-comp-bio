@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Jacques van Helden" />
+
+<meta name="date" content="2019-11-29" />
+
+<title>Markov Models part I : nothing to hide so far</title>
+
+<script src="markov-models_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="markov-models_files/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="markov-models_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="markov-models_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="markov-models_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="markov-models_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="markov-models_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="markov-models_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="markov-models_files/navigation-1.1/tabsets.js"></script>
+
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Markov Models part I : nothing to hide so far</h1>
+<h3 class="subtitle">Computational biology</h3>
+<h4 class="author">Jacques van Helden</h4>
+<h4 class="date">2019-11-29</h4>
+
+</div>
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>During this practical, we will explore different bioinformatics resources to</p>
+<ul>
+<li>compute Markov models (transition matrices) from different sequence types</li>
+<li>compute the probability of a given sequence with a given Markov models</li>
+</ul>
+</div>
+<div id="resources" class="section level2">
+<h2>Resources</h2>
+<table>
+<colgroup>
+<col width="19%" />
+<col width="45%" />
+<col width="34%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Resource</th>
+<th>Description</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>UCUS genome Browser</td>
+<td></td>
+<td><a href="https://genome.ucsc.edu/">genome.ucsc.edu/</a></td>
+</tr>
+<tr class="even">
+<td>UCSC table browser</td>
+<td>Web tool to extract features from the UCUS genome browser</td>
+<td><a href="genome.ucsc.edu/cgi-bin/hgTables">https://genome.ucsc.edu/cgi-bin/hgTables</a></td>
+</tr>
+<tr class="odd">
+<td>RSAT</td>
+<td>Regulatory Sequence Analysis Tools</td>
+<td><a href="http://rsat.eu">rsat.eu</a></td>
+</tr>
+<tr class="even">
+<td>RSAT Metazoa</td>
+<td>Metazoa server of the Regulatory Sequence Analysis Tools</td>
+<td><a href="http://metazoa.rsat.eu">metazoa.rsat.eu</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="getting-cpg-islands-from-the-human-genmoe" class="section level2">
+<h2>Getting CpG islands from the Human genmoe</h2>
+<ol style="list-style-type: decimal">
+<li><p>Open a connection to the <a href="genome.ucsc.edu/cgi-bin/hgTables">UCSC table browser</a></p></li>
+<li><p>Select the <em>hfg38</em> assembly of the Human genome</p></li>
+<li><p>Set the following parameters</p>
+<ul>
+<li><strong>feature group</strong> to <em>Regulation</em> and the feature type to <em>CpG islands</em></li>
+<li><strong>region</strong> to <em>genome</em></li>
+<li><strong>output format</strong> to <em>all fields from selected features</em></li>
+</ul></li>
+<li><p>Click on <strong>get output</strong>. The browser downloads a file named <code>CpG_islands_hg38.bed</code></p></li>
+<li><p>Read the specifications of the <code>bed</code> format on the <a href="https://genome.ucsc.edu/FAQ/FAQformat#format1">formats pagr</a> of the UCSC genome browser.</p></li>
+</ol>
+<div id="exercise" class="section level3">
+<h3>Exercise</h3>
+<ol style="list-style-type: decimal">
+<li><p>Use the same approach to retrieve the sequences of all CpG islands in the Human genome</p></li>
+<li><p>Do the same with the following organisms (always take the latest assembly)</p>
+<ul>
+<li><em>Mus musculus</em> (mouse)</li>
+<li><em>Rattus norvegicus</em> (rat)</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="computing-a-transition-matrix-from-sequences" class="section level2">
+<h2>Computing a transition matrix from sequences</h2>
+<div id="computing-k-mer-frequencies" class="section level3">
+<h3>Computing k-mer frequencies</h3>
+<ol style="list-style-type: decimal">
+<li>Open a connection to the Regulatory Sequence Analysis Tools (<a href="http://rsat.eu/">rsat.eu</a>)</li>
+<li>Choose the Metazoa server</li>
+<li>In the left menu, click on the tool search box (magnifier icon) and start typing <em>background</em>. In In the list of matching tools that appears in the tool menu, select <strong><a href="http://metazoa.rsat.eu/create-background-model_form.cgi">Create background</a></strong>.</li>
+<li>In the <strong>Background sequences</strong>, click <em>browse</em> and find the file with your CpG islan sequences (fasta format).</li>
+<li>Set the <strong>Markov order</strong> to <em>1</em>.</li>
+<li>Click <strong>GO</strong>.</li>
+<li>Save the result file to your computer as (it is a tab-separated value format, so I name it <code>hg38_CpG_2nt-freq.tsv</code>).</li>
+<li>Open it with a spreadsheet.</li>
+</ol>
+<p>What does it contain ? Do you understand the relationship between this result and a first-order Markov Model ?</p>
+</div>
+<div id="converting-k-mer-frequencies-to-a-transition-matrix" class="section level3">
+<h3>Converting k-mer frequencies to a transition matrix</h3>
+<ol style="list-style-type: decimal">
+<li>In the RSAT tool menu, open the tool <strong>Convert Background</strong>.</li>
+<li>Check the option <strong>Custom background model</strong> and make sure the format is <em>oligo-analysis</em>.</li>
+<li>Check <strong>File upload</strong> and browse your computer to find the background model obtained in the previous step.</li>
+<li>Click <strong>Go</strong></li>
+<li>Save the result file on your computer and open it with a spreadsheet.</li>
+</ol>
+</div>
+<div id="exercise-1" class="section level3">
+<h3>Exercise</h3>
+<ol style="list-style-type: decimal">
+<li>Do you understand the relationship between this file and the previoujs one ?</li>
+<li>Starting from the 2nt frequencies, try to recompute one of the transition probabilities and check that you obtain the same result as the <em>convert background</em> tool.</li>
+</ol>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

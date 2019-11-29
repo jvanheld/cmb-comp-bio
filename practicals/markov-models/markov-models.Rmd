@@ -1,0 +1,159 @@
+---
+title: "Markov Models part I : nothing to hide so far"
+subtitle: "Computational biology"
+author: "Jacques van Helden"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    self_contained: false
+    fig_caption: yes
+    highlight: zenburn
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  beamer_presentation:
+    colortheme: dolphin
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    fonttheme: structurebold
+    highlight: tango
+    incremental: no
+    keep_tex: no
+    slide_level: 2
+    theme: Montpellier
+    toc: yes
+  slidy_presentation:
+    self_contained: false
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    highlight: tango
+    incremental: no
+    keep_md: yes
+    smaller: yes
+    theme: cerulean
+    toc: yes
+    widescreen: yes
+  pdf_document:
+    fig_caption: yes
+    highlight: zenburn
+    toc: yes
+    toc_depth: 3
+  ioslides_presentation:
+    self_contained: false
+    css: slides.css
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    highlight: tango
+    smaller: yes
+    toc: yes
+    widescreen: yes
+  word_document:
+    toc: yes
+    toc_depth: 3
+# font-import: http://fonts.googleapis.com/css?family=Risque
+font-family: Garamond
+transition: linear
+---
+
+```{r setup, include=FALSE, echo=FALSE, eval=TRUE}
+library(knitr)
+
+options(width = 300)
+knitr::opts_chunk$set(
+  fig.width = 7, fig.height = 5, 
+  fig.align = "center", 
+  fig.path = "figures/markov-models_",
+  size = "tiny", 
+  echo = FALSE, eval = TRUE, 
+  warning = FALSE, message = FALSE, 
+  results = TRUE, comment = "")
+# knitr::asis_output("\\footnotesize")
+
+# dir.slides <- "~/IFB/NNCR/using_IFB_NNCR/slides/"
+# setwd(dir.slides)
+
+```
+
+## Introduction
+
+During this practical, we will explore different bioinformatics resources to 
+
+- compute Markov models (transition matrices) from different sequence types
+- compute the probability of a given sequence with a given Markov models
+
+
+## Resources
+
+| Resource | Description | URL |
+|--------------|---------------------------------|-------------------------|
+| UCUS genome Browser | |  [genome.ucsc.edu/](https://genome.ucsc.edu/) |
+| UCSC table browser | Web tool to extract features from the UCUS genome browser | [https://genome.ucsc.edu/cgi-bin/hgTables](genome.ucsc.edu/cgi-bin/hgTables)|
+| RSAT | Regulatory Sequence Analysis Tools | [rsat.eu](http://rsat.eu) |
+| RSAT Metazoa | Metazoa server of the Regulatory Sequence Analysis Tools  | [metazoa.rsat.eu](http://metazoa.rsat.eu) |
+
+
+## Getting CpG islands from the Human genmoe
+
+1. Open a connection to the [UCSC table browser](genome.ucsc.edu/cgi-bin/hgTables)
+2. Select the *hfg38* assembly of the Human genome
+3. Set the following parameters
+
+    - **feature group** to *Regulation* and the feature type to *CpG islands*
+    - **region** to *genome*
+    - **output format** to *all fields from selected features*
+    
+4. Click on **get output**. The browser downloads a file named `CpG_islands_hg38.bed`
+5. Read the specifications of the `bed` format on the [formats pagr](https://genome.ucsc.edu/FAQ/FAQformat#format1) of the UCSC genome browser. 
+
+
+### Exercise
+
+1. Use the same approach to retrieve the  sequences of all CpG islands in the Human genome
+
+2. Do the same with the following organisms (always take the latest assembly)
+
+    - *Mus musculus* (mouse)
+    - *Rattus norvegicus* (rat)
+    
+    
+## Computing a transition matrix from sequences
+
+### Computing k-mer frequencies
+
+1. Open a connection to the Regulatory Sequence Analysis Tools ([rsat.eu](http://rsat.eu/))
+2. Choose the Metazoa server
+3. In the left menu, click on the tool search box (magnifier icon) and start typing *background*. In In the list of matching tools that appears in the tool menu, select **[Create background](http://metazoa.rsat.eu/create-background-model_form.cgi)**.
+4. In the **Background sequences**, click *browse* and find the file with your CpG islan sequences (fasta format). 
+5. Set the **Markov order** to *1*. 
+6. Click **GO**. 
+7. Save the result file to your computer as (it is a tab-separated value format, so I name it `hg38_CpG_2nt-freq.tsv`).
+8. Open it with a spreadsheet.  
+
+What does it contain ? Do you understand the relationship between this result and a first-order Markov Model ?
+
+### Converting k-mer frequencies to a transition matrix
+
+1. In the RSAT tool menu, open the tool **Convert Background**. 
+2. Check the option **Custom background model** and make sure the format is *oligo-analysis*.
+3. Check **File upload** and browse your computer to find the background model obtained in the previous step.
+3. Click **Go**
+4. Save the result file on your computer and open it with a spreadsheet. 
+
+### Exercise
+
+1. Do you understand the relationship between this file and the previoujs one ?
+2. Starting from the 2nt frequencies, try to recompute one of the transition probabilities and check that you obtain the same result as the *convert background* tool.  
+
+
+
+
+
+
+
+
+
+
