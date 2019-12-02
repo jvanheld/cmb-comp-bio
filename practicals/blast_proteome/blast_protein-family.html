@@ -588,8 +588,8 @@ Drosophila_melanogaster_proteome.fasta.psq</code></pre>
 <p>OK, the first contact is a bit frightening, because blastp has many options. This is because it allows you to run queries in different modes, with different parameters, and to export the results in different formats.</p>
 <p>In this tutorial we will show you the most usual ways to use the tool, and you will then be able to refine your search by combing back to the manual and understanding the use of additional options.</p>
 </div>
-<div id="similaroty-search-for-one-sequence-against-a-database" class="section level2">
-<h2>Similaroty search for one sequence against a database</h2>
+<div id="similarity-search-for-one-sequence-against-a-database" class="section level2">
+<h2>Similarity search for one sequence against a database</h2>
 <ol style="list-style-type: decimal">
 <li><p>Build a command (<strong>DO NOT RUN IT YET</strong>) that searches similarities for one or several query sequences provided in a fasta file (e.g. <code>P02299.fasta</code>) in the proteome of interest (<code>Drosophila_melanogaster_proteome.fasta</code>). By default, <code>blastp</code> prints the result on the screen, but we prefer to redirect it to a file (e.g. <code>P02299_blastp_result.txt</code>) in order to keep a trace of the result and inspect it later.</p></li>
 <li><p>Send this command to the job scheduler with <code>srun</code>.</p></li>
@@ -618,6 +618,7 @@ Drosophila_melanogaster_proteome.fasta.psq</code></pre>
 </div>
 <div id="setting-a-conservative-cutoff-on-the-e-value" class="section level2">
 <h2>Setting a conservative cutoff on the e-value</h2>
+<p>In <code>blast</code> manual, find the option that enables you to set a threshold (cutoff) on the e-value. Redo the blast search with a threshold of 1e-5 on the e-value.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">## Search similarities for histone 3 in D.melanogaster proteome</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="ex">srun</span> blastp \</span>
 <span id="cb12-3"><a href="#cb12-3"></a>  -db Drosophila_melanogaster_proteome.fasta  \</span>

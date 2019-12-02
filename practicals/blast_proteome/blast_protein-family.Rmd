@@ -340,7 +340,7 @@ OK, the first contact is a bit frightening, because blastp has many options. Thi
 In this tutorial we will show you the most usual ways to use the tool, and you will then be able to refine your search by combing back to the manual and understanding the use of  additional options. 
 
 
-## Similaroty search for one sequence against a database
+## Similarity search for one sequence against a database
 
 1. Build a command (**DO NOT RUN IT YET**) that searches similarities for one or several query sequences provided in a fasta file (e.g. `P02299.fasta`) in the proteome of interest (`Drosophila_melanogaster_proteome.fasta`). By default, `blastp` prints the result on the screen, but we prefer to redirect it to a file (e.g. `P02299_blastp_result.txt`) in order to keep a trace of the result and inspect it later.
 
@@ -370,6 +370,8 @@ less P02299_blastp_result.txt
 
 
 ## Setting a conservative cutoff on the e-value
+
+In  `blast` manual, find the option that enables you to set  a threshold (cutoff) on the e-value. Redo the blast  search with a threshold of 1e-5 on the e-value. 
 
 ```{bash blastp_evalue, eval=FALSE}
 ## Search similarities for histone 3 in D.melanogaster proteome

@@ -12,9 +12,9 @@
 
 <meta name="author" content="Jacques van Helden" />
 
-<meta name="date" content="2019-11-29" />
+<meta name="date" content="2019-12-02" />
 
-<title>Markov Models part I : nothing to hide so far</title>
+<title>Markov Models part 1 : nothing to hide so far</title>
 
 <script src="markov-models_files/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,6 +28,98 @@
 <script src="markov-models_files/navigation-1.1/tabsets.js"></script>
 
 
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
 
 
 <style type="text/css">
@@ -231,10 +323,10 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Markov Models part I : nothing to hide so far</h1>
+<h1 class="title toc-ignore">Markov Models part 1 : nothing to hide so far</h1>
 <h3 class="subtitle">Computational biology</h3>
 <h4 class="author">Jacques van Helden</h4>
-<h4 class="date">2019-11-29</h4>
+<h4 class="date">2019-12-02</h4>
 
 </div>
 
@@ -271,7 +363,7 @@ div.tocify {
 <tr class="even">
 <td>UCSC table browser</td>
 <td>Web tool to extract features from the UCUS genome browser</td>
-<td><a href="genome.ucsc.edu/cgi-bin/hgTables">https://genome.ucsc.edu/cgi-bin/hgTables</a></td>
+<td><a href="https://genome.ucsc.edu/cgi-bin/hgTables">genome.ucsc.edu/cgi-bin/hgTables</a></td>
 </tr>
 <tr class="odd">
 <td>RSAT</td>
@@ -286,24 +378,37 @@ div.tocify {
 </tbody>
 </table>
 </div>
-<div id="getting-cpg-islands-from-the-human-genmoe" class="section level2">
-<h2>Getting CpG islands from the Human genmoe</h2>
+<div id="getting-cpg-islands-from-the-human-genome" class="section level2">
+<h2>Getting CpG islands from the Human genome</h2>
 <ol style="list-style-type: decimal">
-<li><p>Open a connection to the <a href="genome.ucsc.edu/cgi-bin/hgTables">UCSC table browser</a></p></li>
-<li><p>Select the <em>hfg38</em> assembly of the Human genome</p></li>
+<li><p>Open a connection to the <a href="https://genome.ucsc.edu/cgi-bin/hgTables">UCSC table browser</a></p></li>
+<li><p>Select the <em>hg38</em> assembly of the Human genome</p></li>
 <li><p>Set the following parameters</p>
 <ul>
 <li><strong>feature group</strong> to <em>Regulation</em> and the feature type to <em>CpG islands</em></li>
 <li><strong>region</strong> to <em>genome</em></li>
-<li><strong>output format</strong> to <em>all fields from selected features</em></li>
+<li><strong>output format</strong> to <em>bed</em></li>
+<li><strong>Output file</strong> to <code>hg38_CpG_islands.bed</code></li>
+<li>Optional: check the option <strong>gzip compressed</strong>. This will reduce the transfer time, but you will need to uncompress the downloaded result file.</li>
 </ul></li>
-<li><p>Click on <strong>get output</strong>. The browser downloads a file named <code>CpG_islands_hg38.bed</code></p></li>
-<li><p>Read the specifications of the <code>bed</code> format on the <a href="https://genome.ucsc.edu/FAQ/FAQformat#format1">formats pagr</a> of the UCSC genome browser.</p></li>
+<li><p>Click on <strong>get output</strong>. This displays a second page with additional parameters. Leave all parameters to their default values and click <strong>get bed</strong>. The browser downloads a file named <code>hg38_CpG_islands.bed.gz</code>. Uncompress the result and check its content. It should look like this.</p></li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">chr1</span>    84934572        84935054        CpG:_47</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="ex">chr1</span>    63176547        63177427        CpG:_78</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="ex">chr1</span>    125435174       125435976       CpG:_67</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="ex">chr1</span>    183368926       183369826       CpG:_93</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="ex">chr1</span>    3531624 3531843 CpG:_27</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="ex">chr1</span>    3670619 3671074 CpG:_34</span></code></pre></div>
+<ol start="5" style="list-style-type: decimal">
+<li>Read the specifications of the <code>bed</code> format on the <a href="https://genome.ucsc.edu/FAQ/FAQformat#format1">formats pagr</a> of the UCSC genome browser.</li>
+<li>Make a copy of the bed file named <code>hg38_CpG_islands.tsv</code> (the extension <code>tsv</code> stands for “tab-separated values”) and open it with a spreadsheet (e.g. LibreOffice calc or Microsoft Excel) or with the R statistical package.</li>
+<li>Add a column with the sequence length (beware of the zero-based notation of coordinates in <code>bed</code>).</li>
+<li>Compute the number of CpG islands, their min, mean and max lenths.</li>
 </ol>
 <div id="exercise" class="section level3">
 <h3>Exercise</h3>
 <ol style="list-style-type: decimal">
-<li><p>Use the same approach to retrieve the sequences of all CpG islands in the Human genome</p></li>
+<li><p>Use the same approach to retrieve the <strong>sequences</strong> of all CpG islands in the Human genome, in fasta format, and save them in a file named <code>hg38_CpG_islands.fasta</code> (you will need to uncompress the <code>.gz</code> file downloaded from UCSC genome browser).</p></li>
 <li><p>Do the same with the following organisms (always take the latest assembly)</p>
 <ul>
 <li><em>Mus musculus</em> (mouse)</li>
@@ -318,9 +423,9 @@ div.tocify {
 <h3>Computing k-mer frequencies</h3>
 <ol style="list-style-type: decimal">
 <li>Open a connection to the Regulatory Sequence Analysis Tools (<a href="http://rsat.eu/">rsat.eu</a>)</li>
-<li>Choose the Metazoa server</li>
+<li>Choose the <a href="http://metazoa.rsat.eu/">Metazoa server</a></li>
 <li>In the left menu, click on the tool search box (magnifier icon) and start typing <em>background</em>. In In the list of matching tools that appears in the tool menu, select <strong><a href="http://metazoa.rsat.eu/create-background-model_form.cgi">Create background</a></strong>.</li>
-<li>In the <strong>Background sequences</strong>, click <em>browse</em> and find the file with your CpG islan sequences (fasta format).</li>
+<li>In the <strong>Background sequences</strong>, click <em>browse</em> and find the file with your CpG island sequences (fasta format).</li>
 <li>Set the <strong>Markov order</strong> to <em>1</em>.</li>
 <li>Click <strong>GO</strong>.</li>
 <li>Save the result file to your computer as (it is a tab-separated value format, so I name it <code>hg38_CpG_2nt-freq.tsv</code>).</li>
@@ -331,7 +436,7 @@ div.tocify {
 <div id="converting-k-mer-frequencies-to-a-transition-matrix" class="section level3">
 <h3>Converting k-mer frequencies to a transition matrix</h3>
 <ol style="list-style-type: decimal">
-<li>In the RSAT tool menu, open the tool <strong>Convert Background</strong>.</li>
+<li>In the RSAT tool menu, open the tool <strong><a href="http://metazoa.rsat.eu/convert-background-model_form.cgi">Convert Background</a></strong>.</li>
 <li>Check the option <strong>Custom background model</strong> and make sure the format is <em>oligo-analysis</em>.</li>
 <li>Check <strong>File upload</strong> and browse your computer to find the background model obtained in the previous step.</li>
 <li>Click <strong>Go</strong></li>
@@ -341,10 +446,64 @@ div.tocify {
 <div id="exercise-1" class="section level3">
 <h3>Exercise</h3>
 <ol style="list-style-type: decimal">
-<li>Do you understand the relationship between this file and the previoujs one ?</li>
-<li>Starting from the 2nt frequencies, try to recompute one of the transition probabilities and check that you obtain the same result as the <em>convert background</em> tool.</li>
+<li>Do you understand the relationship between this file and the previous one ?</li>
+<li>Starting from the 2nt frequencies, recompute the transition probability from <em>C</em> to <em>G</em> and check that you obtain the same result as the <em>convert background</em> tool. First write the formula with the symbols for the relevant dinucleotide frequencies, then replace these symbols by their actual values, and compute the result.</li>
 </ol>
 </div>
+</div>
+<div id="computing-a-markov-model-for-non-cpg-island-sequences" class="section level2">
+<h2>Computing a Markov model for non-CpG island sequences</h2>
+<p>In order to distinguish between CpG island and other human genomic sequences, we would like to build a Markov model from all the genomic sequences that are not annotated as CpG islands. However, the since the Human genome is quite big (3e+9 nucleotides) we will use a proxy, by computing a Markov model from a random sampling of genomic sequences. These might include some pieces of CpG islands, but this effect should be negligible.</p>
+<p>Importantly, we will select random genome fragments <em>having the same sizes as the CpG islands</em>, because in the next steps we will compare the properties of these two sequence files.</p>
+<ol style="list-style-type: decimal">
+<li>Open a connection to <a href="http://metazoa.rsat.eu/">metazoa.rsat.eu</a>.</li>
+<li>Find and open the tool named <strong><a href="http://metazoa.rsat.eu/random-genome-fragments_form.cgi">random genome fragments</a></strong>.</li>
+<li>Select the option <strong>Use template file</strong>, and select the <code>bed</code> file with the coordinates of the CpG islands (<code>hg38_CpG_islands.bed</code>) that you downloaded from the UCSC genome browser. Set the <strong>Template format</strong> to <em>bed</em>.</li>
+<li>Set the <strong>organism</strong> to <em>Homo sapiens GRCh38</em>.</li>
+<li>In the <strong>Output</strong> option, select <em>Sequences in fasta format</em>.</li>
+<li>Optionally, you can choose the email output, which will send you a message with a link to the result file.</li>
+<li>Click <strong>GO</strong>.</li>
+</ol>
+<p>It will take a few minutes to generate the result.</p>
+<ol start="8" style="list-style-type: decimal">
+<li>In the result page, copy the link of the fasta file and save it in a file on your computer, we will use it several times for this tutorial.</li>
+<li>Save a copy of this file on your computer, with an informative name (for example <code>random-genome-fragments_hg38.fasta</code>).</li>
+<li>Open the tool <strong><a href="http://metazoa.rsat.eu/create-background-model_form.cgi">create background</a></strong>.</li>
+<li>In the option <strong>URL of the sequence</strong>, paste the link of your random genomic fragments.</li>
+<li>Set the <strong>Markov order</strong> to <em>1</em>.</li>
+<li>Click <strong>GO</strong>.</li>
+<li>Save the background file on your computer with the name <code>hg38_genomic-bg_2nt-freq.tsv</code>.</li>
+</ol>
+<p>We now obtained dinucleotide frequencies of 10,000 random genomic fragments of 1000 pb. We can convert these dinucleotide frequencies into a transition matrix.</p>
+<ol start="14" style="list-style-type: decimal">
+<li>Open the tool <strong><a href="http://metazoa.rsat.eu/convert-background-model_form.cgi">convert background model</a></strong></li>
+<li>Select <strong>Custom background model</strong>, <strong>File Upload</strong> and choose the dinucleotide frequency file computed above (<code>hg38_genomic-bg_2nt-freq.tsv</code>).</li>
+<li>Click <strong>GO</strong> and save the transition file with the name <code>hg38_genomic-bg_transitions_m1.tsv</code>.</li>
+</ol>
+<p>Do the same exercise as above: starting from the dinucleotide frequencies, compute the transition probability from <em>C</em> to <em>G</em> and compare it to the value found in the CpG islands.</p>
+</div>
+<div id="computing-the-probability-of-the-cpg-islands" class="section level2">
+<h2>Computing the probability of the CpG islands</h2>
+<p>We will now compute the probability of each CpG island, using the Markov model of genomic background estimated from the random genome fragments.</p>
+<ol style="list-style-type: decimal">
+<li>Open a connection to <a href="http://metazoa.rsat.eu/">metazoa.rsat.eu</a>.</li>
+<li>Find and open the tool named <strong><a href="">sequence probability</a></strong>.</li>
+<li>Upload the sequences of the CpG islands (fasta format).</li>
+<li>Choose a <strong>custom background model</strong> and upload the dinucleotide frequencies estimated for the genomic background (those measured in the random selection of genomic fragments).</li>
+<li>Click <strong>GO</strong>.</li>
+<li>Download the result table on your computer, and open it with either a spreadsheet or R.</li>
+<li>Plot and histogram with the logarithms of p-values.</li>
+<li>Plot the log(p-value) as a function of the sequence length.</li>
+<li>Writ ea few sentences to interpret the results.</li>
+</ol>
+</div>
+<div id="computing-the-probability-of-the-random-genome-fragments" class="section level2">
+<h2>Computing the probability of the random genome fragments</h2>
+<ol style="list-style-type: decimal">
+<li>Compute the probabilities of the random genome fragments as in the previous step.</li>
+<li>Open the result file in a spreadsheet or R.</li>
+<li>Do the same plots as for CpG islands and interpret the results.</li>
+</ol>
 </div>
 
 

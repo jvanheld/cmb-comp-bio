@@ -1,5 +1,5 @@
 ---
-title: "Markov Models part I : nothing to hide so far"
+title: "Markov Models part 1 : nothing to hide so far"
 subtitle: "Computational biology"
 author: "Jacques van Helden"
 date: '`r Sys.Date()`'
@@ -68,9 +68,12 @@ knitr::opts_chunk$set(
   fig.align = "center", 
   fig.path = "figures/markov-models_",
   size = "tiny", 
-  echo = FALSE, eval = TRUE, 
-  warning = FALSE, message = FALSE, 
-  results = TRUE, comment = "")
+  # echo = FALSE, 
+  eval = FALSE, 
+  warning = FALSE, 
+  message = FALSE, 
+  results = TRUE, 
+  comment = "")
 # knitr::asis_output("\\footnotesize")
 
 # dir.slides <- "~/IFB/NNCR/using_IFB_NNCR/slides/"
@@ -91,28 +94,43 @@ During this practical, we will explore different bioinformatics resources to
 | Resource | Description | URL |
 |--------------|---------------------------------|-------------------------|
 | UCUS genome Browser | |  [genome.ucsc.edu/](https://genome.ucsc.edu/) |
-| UCSC table browser | Web tool to extract features from the UCUS genome browser | [https://genome.ucsc.edu/cgi-bin/hgTables](genome.ucsc.edu/cgi-bin/hgTables)|
+| UCSC table browser | Web tool to extract features from the UCUS genome browser | [genome.ucsc.edu/cgi-bin/hgTables](https://genome.ucsc.edu/cgi-bin/hgTables)|
 | RSAT | Regulatory Sequence Analysis Tools | [rsat.eu](http://rsat.eu) |
 | RSAT Metazoa | Metazoa server of the Regulatory Sequence Analysis Tools  | [metazoa.rsat.eu](http://metazoa.rsat.eu) |
 
 
-## Getting CpG islands from the Human genmoe
+## Getting CpG islands from the Human genome
 
-1. Open a connection to the [UCSC table browser](genome.ucsc.edu/cgi-bin/hgTables)
-2. Select the *hfg38* assembly of the Human genome
+1. Open a connection to the [UCSC table browser](https://genome.ucsc.edu/cgi-bin/hgTables)
+2. Select the *hg38* assembly of the Human genome
 3. Set the following parameters
 
     - **feature group** to *Regulation* and the feature type to *CpG islands*
     - **region** to *genome*
-    - **output format** to *all fields from selected features*
+    - **output format** to *bed*
+    - **Output file** to `hg38_CpG_islands.bed`
+    - Optional: check the option **gzip compressed**. This will reduce the transfer time, but you will need to uncompress the downloaded result file. 
     
-4. Click on **get output**. The browser downloads a file named `CpG_islands_hg38.bed`
-5. Read the specifications of the `bed` format on the [formats pagr](https://genome.ucsc.edu/FAQ/FAQformat#format1) of the UCSC genome browser. 
+4. Click on **get output**.  This displays a second page with additional parameters. Leave all parameters to their default values and click **get bed**.  The browser downloads a file named `hg38_CpG_islands.bed.gz`. Uncompress the result and check its content. It should look like this. 
 
+```{bash bed_example, eval=FALSE, echo=TRUE}
+chr1    84934572        84935054        CpG:_47
+chr1    63176547        63177427        CpG:_78
+chr1    125435174       125435976       CpG:_67
+chr1    183368926       183369826       CpG:_93
+chr1    3531624 3531843 CpG:_27
+chr1    3670619 3671074 CpG:_34
+
+```
+
+5. Read the specifications of the `bed` format on the [formats pagr](https://genome.ucsc.edu/FAQ/FAQformat#format1) of the UCSC genome browser. 
+6. Make a copy of the bed file named `hg38_CpG_islands.tsv` (the extension `tsv` stands for "tab-separated values") and open it with a spreadsheet (e.g. LibreOffice calc or Microsoft Excel) or with the R statistical package. 
+7. Add a column with the sequence length (beware of the zero-based notation of coordinates in `bed`).
+8. Compute the number of CpG islands, their min, mean and max lenths.
 
 ### Exercise
 
-1. Use the same approach to retrieve the  sequences of all CpG islands in the Human genome
+1. Use the same approach to retrieve the  **sequences** of all CpG islands in the Human genome, in fasta format, and save them in a file named `hg38_CpG_islands.fasta` (you will need to uncompress the `.gz` file downloaded from UCSC genome browser).
 
 2. Do the same with the following organisms (always take the latest assembly)
 
@@ -125,9 +143,9 @@ During this practical, we will explore different bioinformatics resources to
 ### Computing k-mer frequencies
 
 1. Open a connection to the Regulatory Sequence Analysis Tools ([rsat.eu](http://rsat.eu/))
-2. Choose the Metazoa server
+2. Choose the [Metazoa server](http://metazoa.rsat.eu/)
 3. In the left menu, click on the tool search box (magnifier icon) and start typing *background*. In In the list of matching tools that appears in the tool menu, select **[Create background](http://metazoa.rsat.eu/create-background-model_form.cgi)**.
-4. In the **Background sequences**, click *browse* and find the file with your CpG islan sequences (fasta format). 
+4. In the **Background sequences**, click *browse* and find the file with your CpG island sequences (fasta format). 
 5. Set the **Markov order** to *1*. 
 6. Click **GO**. 
 7. Save the result file to your computer as (it is a tab-separated value format, so I name it `hg38_CpG_2nt-freq.tsv`).
@@ -137,7 +155,7 @@ What does it contain ? Do you understand the relationship between this result an
 
 ### Converting k-mer frequencies to a transition matrix
 
-1. In the RSAT tool menu, open the tool **Convert Background**. 
+1. In the RSAT tool menu, open the tool **[Convert Background](http://metazoa.rsat.eu/convert-background-model_form.cgi)**. 
 2. Check the option **Custom background model** and make sure the format is *oligo-analysis*.
 3. Check **File upload** and browse your computer to find the background model obtained in the previous step.
 3. Click **Go**
@@ -145,8 +163,63 @@ What does it contain ? Do you understand the relationship between this result an
 
 ### Exercise
 
-1. Do you understand the relationship between this file and the previoujs one ?
-2. Starting from the 2nt frequencies, try to recompute one of the transition probabilities and check that you obtain the same result as the *convert background* tool.  
+1. Do you understand the relationship between this file and the previous one ?
+2. Starting from the 2nt frequencies, recompute the transition probability from *C* to *G* and check that you obtain the same result as the *convert background* tool. First write the formula with the symbols for the relevant dinucleotide frequencies, then replace these symbols by their actual values, and compute the result.
+
+## Computing a Markov model for non-CpG island sequences 
+
+In order to distinguish between CpG island and other human genomic sequences, we would like to build a Markov model from all the genomic sequences that are not annotated as CpG islands.  However, the since the Human genome is quite big (3e+9 nucleotides) we will use a proxy, by computing a Markov model from a random sampling of genomic sequences. These might include some pieces of CpG islands, but this effect should be negligible. 
+
+Importantly, we will select random genome fragments *having the same sizes as the CpG islands*, because in the next steps we will compare the properties of these two sequence files. 
+
+1. Open a connection to [metazoa.rsat.eu](http://metazoa.rsat.eu/).
+2. Find and open the tool named **[random genome fragments](http://metazoa.rsat.eu/random-genome-fragments_form.cgi)**. 
+3. Select the option **Use template file**, and select the `bed` file with the coordinates of the CpG islands  (`hg38_CpG_islands.bed`) that you downloaded from the UCSC genome browser. Set the **Template format** to *bed*. 
+4. Set the **organism** to *Homo sapiens GRCh38*. 
+5. In the **Output** option, select *Sequences in fasta format*.
+6. Optionally, you can choose the email output, which will send you a message with a link to the result file. 
+7. Click **GO**. 
+
+It will take a few minutes to generate the result. 
+
+8. In the result page, copy the link of the fasta file and save it in a file on your computer, we will use it several times for this tutorial. 
+9. Save a copy of this file on your computer, with an informative name (for example `random-genome-fragments_hg38.fasta`).
+9. Open the tool **[create background](http://metazoa.rsat.eu/create-background-model_form.cgi)**. 
+10. In the option **URL of the sequence**, paste the link of your random genomic fragments. 
+11. Set the **Markov order** to *1*.
+12. Click **GO**. 
+13. Save the background file on your computer with the name `hg38_genomic-bg_2nt-freq.tsv`. 
+
+We now obtained dinucleotide frequencies of 10,000 random genomic fragments of 1000 pb. We can convert these dinucleotide frequencies into a transition matrix.
+
+14. Open the tool **[convert background model](http://metazoa.rsat.eu/convert-background-model_form.cgi)**
+15. Select **Custom background model**, **File Upload** and choose the dinucleotide frequency file computed above (`hg38_genomic-bg_2nt-freq.tsv`). 
+16. Click **GO** and save the transition file with the name `hg38_genomic-bg_transitions_m1.tsv`. 
+
+Do the same exercise as above: starting from the dinucleotide frequencies, compute the transition probability from *C* to *G* and compare it to the value found in the CpG islands. 
+
+## Computing the probability of the CpG islands
+
+We will now compute the probability of each CpG island, using the Markov model of genomic background estimated from the random genome fragments.
+
+1. Open a connection to [metazoa.rsat.eu](http://metazoa.rsat.eu/).
+2. Find and open the tool named **[sequence probability]()**.
+3. Upload the sequences of the CpG islands (fasta format). 
+4. Choose a **custom background model** and upload the dinucleotide frequencies estimated for the genomic background (those measured in the random selection of genomic fragments).
+5. Click **GO**.
+6. Download the result table on your computer, and open it with either a spreadsheet or R. 
+7. Plot and histogram with the logarithms of p-values. 
+8. Plot the log(p-value) as a function of the sequence length. 
+9. Writ ea few sentences to interpret the results.
+
+
+## Computing the probability of the random genome fragments
+
+1. Compute the probabilities of the random genome fragments as in the previous step.
+2. Open the result file in a spreadsheet or R.
+3. Do the same plots as for CpG islands and interpret the results. 
+
+
 
 
 
