@@ -93,7 +93,7 @@ During this practical, we will explore different bioinformatics resources to
 
 | Resource | Description | URL |
 |--------------|---------------------------------|-------------------------|
-| UCUS genome Browser | |  [genome.ucsc.edu/](https://genome.ucsc.edu/) |
+| UCSC genome Browser | |  [genome.ucsc.edu/](https://genome.ucsc.edu/) |
 | UCSC table browser | Web tool to extract features from the UCUS genome browser | [genome.ucsc.edu/cgi-bin/hgTables](https://genome.ucsc.edu/cgi-bin/hgTables)|
 | RSAT | Regulatory Sequence Analysis Tools | [rsat.eu](http://rsat.eu) |
 | RSAT Metazoa | Metazoa server of the Regulatory Sequence Analysis Tools  | [metazoa.rsat.eu](http://metazoa.rsat.eu) |
@@ -126,7 +126,7 @@ chr1    3670619 3671074 CpG:_34
 5. Read the specifications of the `bed` format on the [formats pagr](https://genome.ucsc.edu/FAQ/FAQformat#format1) of the UCSC genome browser. 
 6. Make a copy of the bed file named `hg38_CpG_islands.tsv` (the extension `tsv` stands for "tab-separated values") and open it with a spreadsheet (e.g. LibreOffice calc or Microsoft Excel) or with the R statistical package. 
 7. Add a column with the sequence length (beware of the zero-based notation of coordinates in `bed`).
-8. Compute the number of CpG islands, their min, mean and max lenths.
+8. Compute the number of CpG islands, their min, mean and max lengths.
 
 ### Exercise
 
