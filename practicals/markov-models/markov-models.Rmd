@@ -1,5 +1,5 @@
 ---
-title: "Markov Models part 1 : nothing to hide so far"
+title: "Markov Models (nothing to hide so far)"
 subtitle: "Computational biology"
 author: "Jacques van Helden"
 date: '`r Sys.Date()`'
@@ -124,9 +124,16 @@ chr1    3670619 3671074 CpG:_34
 ```
 
 5. Read the specifications of the `bed` format on the [formats pagr](https://genome.ucsc.edu/FAQ/FAQformat#format1) of the UCSC genome browser. 
-6. Make a copy of the bed file named `hg38_CpG_islands.tsv` (the extension `tsv` stands for "tab-separated values") and open it with a spreadsheet (e.g. LibreOffice calc or Microsoft Excel) or with the R statistical package. 
-7. Add a column with the sequence length (beware of the zero-based notation of coordinates in `bed`).
-8. Compute the number of CpG islands, their min, mean and max lengths.
+
+### Exercise
+
+1. Make a copy of the bed file named `hg38_CpG_islands.tsv` (the extension `tsv` stands for "tab-separated values") and open it with a spreadsheet (e.g. LibreOffice calc or Microsoft Excel) or with the R statistical package. 
+2. Add a column with the sequence length (beware of the zero-based notation of coordinates in `bed`).
+3. Compute the number of CpG islands, their min, mean and max lengths.
+4. Compute the cumulative size of CpG islands (in Megabases) and the genome coverage (in percent).
+5. Plot the distribution of lengths for the CpG islands.
+
+
 
 ### Exercise
 
@@ -136,7 +143,6 @@ chr1    3670619 3671074 CpG:_34
 
     - *Mus musculus* (mouse)
     - *Rattus norvegicus* (rat)
-    
     
 ## Computing a transition matrix from sequences
 
@@ -151,19 +157,21 @@ chr1    3670619 3671074 CpG:_34
 7. Save the result file to your computer as (it is a tab-separated value format, so I name it `hg38_CpG_2nt-freq.tsv`).
 8. Open it with a spreadsheet.  
 
-What does it contain ? Do you understand the relationship between this result and a first-order Markov Model ?
+What does it contain? Do you understand the relationship between this result and a first-order Markov Model?
 
 ### Converting k-mer frequencies to a transition matrix
 
 1. In the RSAT tool menu, open the tool **[Convert Background](http://metazoa.rsat.eu/convert-background-model_form.cgi)**. 
-2. Check the option **Custom background model** and make sure the format is *oligo-analysis*.
+2. Check the option **Custom background model** and make sure the input format is *oligo-analysis*.
 3. Check **File upload** and browse your computer to find the background model obtained in the previous step.
-3. Click **Go**
-4. Save the result file on your computer and open it with a spreadsheet. 
+4. Check that the **Output format** is set to *transitions*.
+5. Set the **decimals** to 5.
+6. Click **Go**
+7. Save the result file on your computer and open it with a spreadsheet. 
 
 ### Exercise
 
-1. Do you understand the relationship between this file and the previous one ?
+1. Do you understand the relationship between this file and the previous one?
 2. Starting from the 2nt frequencies, recompute the transition probability from *C* to *G* and check that you obtain the same result as the *convert background* tool. First write the formula with the symbols for the relevant dinucleotide frequencies, then replace these symbols by their actual values, and compute the result.
 
 ## Computing a Markov model for non-CpG island sequences 
@@ -198,26 +206,38 @@ We now obtained dinucleotide frequencies of 10,000 random genomic fragments of 1
 
 Do the same exercise as above: starting from the dinucleotide frequencies, compute the transition probability from *C* to *G* and compare it to the value found in the CpG islands. 
 
-## Computing the probability of the CpG islands
+## Computing the probability of the CpG islands given the genomic background model
 
 We will now compute the probability of each CpG island, using the Markov model of genomic background estimated from the random genome fragments.
 
 1. Open a connection to [metazoa.rsat.eu](http://metazoa.rsat.eu/).
-2. Find and open the tool named **[sequence probability]()**.
+2. Find and open the tool named **[sequence probability](http://rsat.sb-roscoff.fr/seq-proba_form.cgi)**.
 3. Upload the sequences of the CpG islands (fasta format). 
 4. Choose a **custom background model** and upload the dinucleotide frequencies estimated for the genomic background (those measured in the random selection of genomic fragments).
 5. Click **GO**.
 6. Download the result table on your computer, and open it with either a spreadsheet or R. 
 7. Plot and histogram with the logarithms of p-values. 
 8. Plot the log(p-value) as a function of the sequence length. 
-9. Writ ea few sentences to interpret the results.
+9. Write a few sentences to interpret the results.
 
+## Computing the probabilities of CpG islands given the CpG island background model
+
+Run the same analyses as above but use the Markov model built from the CpG islands. 
 
 ## Computing the probability of the random genome fragments
 
-1. Compute the probabilities of the random genome fragments as in the previous step.
+1. Compute the probabilities of the random genome fragments as in the previous steps: first given the genomic background model and then given the CpG island background model).
 2. Open the result file in a spreadsheet or R.
 3. Do the same plots as for CpG islands and interpret the results. 
+
+
+## Discriminating sequences
+
+We will not compute the log-ratio of the sequence probabilities computed using Markov models respectively estimated from the genomic background and from CpG islands.
+
+$$score(S) = log \left( \frac{P(S|CpG)}{P(S|Bg)} \right) $$
+
+
 
 
 
