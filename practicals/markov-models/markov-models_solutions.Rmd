@@ -1,0 +1,418 @@
+---
+title: "Markov Models part 1: nothing to hide so far. Solutions"
+subtitle: "Computational biology"
+author: "Jacques van Helden"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    self_contained: false
+    code_folding: hide
+    fig_caption: yes
+    highlight: zenburn
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  beamer_presentation:
+    colortheme: dolphin
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    fonttheme: structurebold
+    highlight: tango
+    incremental: no
+    keep_tex: no
+    slide_level: 2
+    theme: Montpellier
+    toc: yes
+  slidy_presentation:
+    self_contained: false
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    highlight: tango
+    incremental: no
+    keep_md: yes
+    smaller: yes
+    theme: cerulean
+    toc: yes
+    widescreen: yes
+  pdf_document:
+    fig_caption: yes
+    highlight: zenburn
+    toc: yes
+    toc_depth: 3
+  ioslides_presentation:
+    self_contained: false
+    css: slides.css
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    highlight: tango
+    smaller: yes
+    toc: yes
+    widescreen: yes
+  word_document:
+    toc: yes
+    toc_depth: 3
+# font-import: http://fonts.googleapis.com/css?family=Risque
+font-family: Garamond
+transition: linear
+---
+
+```{r setup, include=FALSE, echo=FALSE, eval=TRUE}
+library(knitr)
+
+options(width = 300)
+knitr::opts_chunk$set(
+  fig.width = 7, fig.height = 5, 
+  fig.align = "center", 
+  fig.path = "figures/markov-models_",
+  size = "tiny", 
+  # echo = FALSE, 
+  eval = TRUE, 
+  warning = FALSE, 
+  message = FALSE, 
+  results = TRUE, 
+  comment = "")
+# knitr::asis_output("\\footnotesize")
+
+# dir.slides <- "~/IFB/NNCR/using_IFB_NNCR/slides/"
+# setwd(dir.slides)
+
+```
+
+```{r libraries}
+if (!require("gplots")) {
+   install.packages("gplots", dependencies = TRUE)
+   library(gplots)
+   }
+if (!require("RColorBrewer")) {
+   install.packages("RColorBrewer", dependencies = TRUE)
+   library(RColorBrewer)
+   }
+
+```
+
+## CpG island length distribution
+
+```{r load_CpG_coordinates}
+## Load CpG island coordinates
+CpG.coord <- read.delim(file = "results/hg38/hg38_CpG_islands.bed.gz", header = FALSE)
+
+names(CpG.coord) <- c("chr", "start", "end", "id")
+## Note: bed convention : the end marks the first position
+## **after** the feature, so the length is simply the difference
+CpG.coord$length <- CpG.coord$end - CpG.coord$start
+
+
+```
+
+
+
+```{r CpG_len_stat}
+
+genome.size <-  3e+9
+
+## Compute statistics about CpG island lengths
+CpG.length.stat <- data.frame(
+  nb = nrow(CpG.coord),
+  min = min(CpG.coord$length),
+  Q1 = quantile(CpG.coord$length, probs = 0.25),
+  median = median(CpG.coord$length),
+  mean = mean(CpG.coord$length),
+  Q3 = quantile(CpG.coord$length, probs = 0.75),
+  pc95 = quantile(CpG.coord$length, probs = 0.95),
+  max = max(CpG.coord$length),
+  MB =  sum(CpG.coord$length) / 1e6,
+  cov.percent = sum(CpG.coord$length) / genome.size * 100
+)
+
+
+## Print the stats
+kable(CpG.length.stat, caption = "Statistics about CpG island lengths", digits = 3, row.names = FALSE)
+
+```
+
+The currently annotated CpG islands  cover `r round(digits=1, CpG.length.stat$MB)` Mb, which represent `r round(digits=1, CpG.length.stat$cov.percent)`% of the genome. 
+
+
+
+```{r CpG_lengths, fig.width=7, fig.height=7, fig.cap="Distribution of lengths for all the CpG islands annotated in the Human genome.", out.width="80%"}
+par(mfrow = c(2,1))
+
+
+par(mar = c(4.1, 5.1, 1, 1))
+
+hist(CpG.coord$length, 
+     breaks = seq(from = 0, 
+                  to = CpG.length.stat$max + 50, 
+                  by = 50),
+     main = NA, las = 1,
+     xlab = "CpG length", ylab = "Number of CpGs")
+
+## Draw the histogram with a limited X axis to see the relevant part of the distribution
+hist(CpG.coord$length, 
+     breaks = seq(from = 0, 
+                  to = CpG.length.stat$max + 50, 
+                  by = 50),
+     xlim = c(0,3000),
+     main = NA, las = 1,
+     xlab = "CpG length (truncated X scale)", ylab = "Number of CpGs", col = "gray")
+
+par(mar = c(4.1, 5.1, 4.1, 2.1))
+par(mfrow = c(1,1))
+```
+
+
+
+## Loading the Markov models
+
+We start by loading the two Markov models previously computed from the [RSAT](http://metazoa.rsat.eu/) tool [create background model](http://rsat.sb-roscoff.fr/create-background-model_form.cgi).
+
+
+```{r load_markov_models}
+## Load a transition matrix from the RSAT result
+readMarkovModel <- function(file) {
+  model <- read.delim(
+    file = file, 
+    row.names = 1)
+  names(model) <- toupper(names(model))
+  rownames(model) <- toupper(rownames(model))
+  prior <- model[nrow(model),1:4] ## Last row contains priors as comments
+  names(prior) <- names(model)[1:4]
+  transitions <- rbind(model[1:4, 1:4], "B" = prior)
+  return(transitions)
+}
+
+## Load the CpG transition table from the RSAT result
+transitions.CpG <- readMarkovModel(file = "results/hg38/hg38_CpG_transitions_m1.tsv")
+
+## Load the genomic background transition table from the RSAT result
+transitions.Bg <- readMarkovModel(file = "results/hg38/hg38_genomic-bg_transitions_m1.tsv")
+
+## Check that the rows of the transition matrix sum to 1
+## (given some rounding errors)
+# apply(transitions.CpG[2:5], 1, sum)
+# apply(transitions.Bg[2:5], 1, sum)
+
+```
+
+```{r transition_heatmap_function}
+## Define a function that draws a heatmap from a transition matrix
+transition.heatmap <- function(
+  transitions, 
+  main = "Transitions",
+  col.palette = gray.colors(n = 100, start = 1, end = 0),
+  breaks = (0:length(col.palette))/(n.colors*2)) {
+  
+
+  n.colors <- length(col.palette)  
+  h <- heatmap.2(
+    as.matrix(transitions), 
+    main = main,
+    cellnote = round(digits = 3, as.matrix(transitions)),
+    trace = "none", 
+    margins = c(4, 4),
+    #    offsetRow = -10,
+    breaks = breaks, 
+    key = FALSE,
+    srtCol = 0,
+    notecol = "black", 
+    notecex = 1.2,
+    col = col.palette,
+    scale = "none", 
+    las = 1, 
+    Rowv = FALSE, Colv = FALSE, dendrogram = "none")
+  return(h)
+  #  grab_grob()
+}
+
+```
+
+
+```{r transition_heatmap_CpG, fig.width=6, fig.height=6, out.width="100%", fig.cap="Heatmap of the transition matrices from 1st order Markov models trained on CpG islands."}
+
+## Draw transition heatmap
+heatmap.CpG <- transition.heatmap(transitions.CpG, "CpG islands")
+
+```
+
+
+
+
+```{r transition_heatmap_Bg, fig.width=6, fig.height=6, out.width="100%", fig.cap="Heatmap of the transition matrices from 1st order Markov models trained on genomic background."}
+
+## Draw transition heatmap
+heatmap.Bg <- transition.heatmap(transitions.Bg, "Genomic background")
+
+```
+
+
+## Discrimination between two models
+
+Problem: for a given sequence of events (e.g. a nucleotidic sequence), identify the most likely Markov model.
+
+Approach: compute the log-likelihood ratios (log-odd ratios) of the sequence probabilities computed using respectively the CpG island and genomic background models.
+
+$$P_{\text{CpG}}(S) = P_{\text{CpG}}(S_1) \cdot \prod_{i=1}^{n-1} P_{\text{CpG}}(S_{i+1}|S_i)$$
+$$P_{\text{Bg}}(S) = P_{\text{Bg}}(S_1) \cdot \prod_{i=1}^{n-1} P_{\text{Bg}}(S_{i+1}|S_i)$$
+
+
+$$L(S) = log \left( \frac{ P_{\text{CpG}}(S)}{P_{\text{Bg}}(S)} \right)$$
+
+where 
+
+- $L(S)$ is the log-likelihood of the sequence $S$, 
+- $P_{\text{CpG}}(S)$ the probability for this sequence to be generated by the CpG island model, and
+- $P_{\text{Bg}}(S)$ its probability to be generated by the background model. 
+
+A more efficient approach : rather than computing the two sequence probabilities (as the product of transition probabilities), we can compute once and forever a matrix with tbe log-odds of residue transitions.
+
+$$L(r_j|r_i) = log \left( \frac{P_{\text{CpG}}(r_j|r_i)}{P_{\text{Bg}}(r_j|r_i)} \right)$$
+
+
+
+```{r transition_log_odds, fig.width=6, fig.height=6, out.width="100%", fig.cap="Heatmap of the log-odds between CpG and genomic background."}
+
+my.palette <- colorRampPalette(c("blue", "white", "red"))(n = 100)
+
+## Compute log-odds of transition frequencies
+transition.log.odds <- log2(transitions.CpG / transitions.Bg)
+
+max.lor <- ceiling(max(abs(range(transition.log.odds))))
+
+heatmap.logodds <- transition.heatmap(
+  transition.log.odds, "CpG / Bg log-odds",
+  col.palette = my.palette,
+#  breaks = seq(from = -max.lor, to = +max.lor, length.out = length(my.palette) + 1)
+  breaks = length(my.palette) + 1
+)
+
+```
+
+
+```{r transition_heatmaps, fig.width=6, fig.height=6, out.width="100%", fig.cap="Heatmaps of the transition matrices from 1st order Markov models trained on CpG islands (left) or genomic background (right), respectively."}
+# library(gridGraphics)
+# library(grid)
+# library(gplots)
+# library(gridExtra)
+# 
+# grab_grob <- function(){
+#   grid.echo()
+#   grid.grab()
+# }
+# heatmaps <- list(
+#   CpG = one.heatmap(transitions.CpG, "CpG islands"),
+#   Bg = one.heatmap(transitions.Bg, "Genomic background")
+# )
+# grid.newpage()
+# grid.arrange(grobs = heatmaps, ncol = 2, clip = TRUE)
+
+```
+
+We can then use this log-odds matrix to compute the log-odds of a sequence as the sum of the transition log-odds. 
+
+$$L(S) = L_{\text{B}}(S_1) \cdot \sum_{i=1}^{n-1} L(S_{i+1}|S_i)$$
+
+## Hidden Markov Model
+
+We already dispose of the emission probabilities of the residues in the two respective states (CpG islands and genomic background). We now need to compute the transition probabilities between the states. 
+
+We can estimate these probabilities based on the following parameters
+
+- genome size: $S_{Bg} = `r genome.size`$ 
+- total size of the annotated CpG islands: $S_{CpG} = `r format(digits=12, big.mark=",", sum(CpG.coord$length))`$
+- number of CpG islands: $N_{CpG} = `r format(digits=12, big.mark=",", CpG.length.stat$nb)`$
+
+```{r CpG_parameters}
+
+## Estimate transition matrix for CpG islands
+
+stats <- list(L.G = 3e+9, ## Genome size
+                L.CpG = 24200434, # Total size of CpG islands (label: +)
+                nb.CpG = 31144 # Number of CpG islands
+)
+stats$L.non.CpG <- stats$L.G - stats$L.CpG # Total size of non-CpG Islands (label: -)
+stats$CpG.mean.length <- stats$L.CpG / stats$nb.CpG
+
+library(knitr)
+library(pander)
+pander(as.data.frame(stats), 
+       caption = "Parameters used to compute the CpG island transition matrix.", 
+       big.mark = ",")
+
+```
+
+
+```{r CpG_transition_matrix}
+
+## Estimate transition matrix for CpG islands
+
+stats <- list(L.G = 3e+9, ## Genome size
+                L.CpG = 24200434, # Total size of CpG islands (label: +)
+                nb.CpG = 31144 # Number of CpG islands
+)
+stats$L.non.CpG <- stats$L.G - stats$L.CpG # Total size of non-CpG Islands (label: -)
+stats$CpG.mean.length <- stats$L.CpG / stats$nb.CpG
+
+
+## Transition matrix
+transitions <- data.frame(matrix(nrow = 2, ncol = 2))
+names(transitions) <- c("+", "-")
+rownames(transitions) <- c("+", "-")
+
+## Transitions from non-CpG to CpG.
+## This is the number of switches from non-CpG to CpG island (the number of nucleotide preceding a CpG islands)
+## divided by the total length of non-CPG islands
+transitions["-", "+"] <- stats$nb.CpG / stats$L.non.CpG
+## The only other possible transition from "-" is to "-" so the sum is 1 (complementary events)
+transitions["-", "-"] <- 1 - transitions["-", "+"]
+
+## Transitions from CpG to non-CpG
+## Same reasoning: the number of ending CpG positions divided by the total length of CpGs
+transitions["+", "-"] <- stats$nb.CpG / stats$L.CpG
+## The only other possible transition from "+" is to "+" so the sum is 1 (complementary events)
+transitions["+", "+"] <- 1 - transitions["+", "-"]
+
+
+```
+
+
+
+For convenience, we will use the labels $+$ and $-$ to denote the CpG islands and non-CpG island regions, respectively.
+
+
+We can compute the probability of switching from a non-CpG islands to a CpG island with the following reasoning. 
+
+- The total size of non-CpG islands is the difference between genome size (`r format(digits=12, big.mark=",", stats$L.G)`) and the total size of the CpG islands (`r format(digits=12, big.mark=",", stats$L.CpG)`).
+
+$$S_{-}  = S_{bg} - S_{+} = `r format(digits=12, big.mark=",", stats$L.G)` - `r format(digits=12, big.mark=",", stats$L.CpG)` = `r format(digits=12, big.mark=",", stats$L.non.CpG)`$$
+
+- In total, there are $`r format(digits=12, big.mark=",", stats$nb.CpG)`$ CpG islands in the genome, and each of them is preceded by a non-CpG island region. There are thus  $`r format(digits=12, big.mark=",", stats$nb.CpG)`$ transitions from non-CpG to CpG. The probability of transition from non-CpG to CpG  is thus the number of non-CpG positions preceding a CpG divided by the total number of non-CpG positions.
+
+$$P(+|-) = N_+ / S_- = \frac{`r format(digits=12, big.mark=",", stats$nb.CpG)`}{`r format(digits=12, big.mark=",", stats$L.non.CpG)`} = `r format(digits=5, transitions["-", "+"])`$$
+
+- Since there are only two possible states, the transition probability from non-CpG to non-CpG is the complement of the transition probability from non-CpG to CpG. 
+
+$$P(-|-) = 1 - P(+|-) = `r format(digits=5, transitions["-", "-"])`$$
+
+The same reasoning applies to compute the transition probabilities from CpG islands. 
+
+- Each CpG island has an exactly one ending nucleotide, which precedes a non-CpG island nucleotide. The number of nucleotides marking a transition from CpG to non-CpG is thus  $`r format(digits=12, big.mark=",", stats$nb.CpG)`$. The probability of transition from CpG to non-CpG is this number divided by the total size of all CpGs.
+
+$$P(-|+) = N_+ / S_+ = \frac{`r format(digits=12, big.mark=",", stats$nb.CpG)`}{`r format(digits=12, big.mark=",", stats$L.CpG)`} = `r format(digits=3, transitions["+", "-"])`$$
+
+- The probability of transition from CpG to CpG is the complement.
+
+$$P(+|+) = 1 - P(-|+) = `r format(digits=5, transitions["+", "+"])`$$
+
+The results are summarised in the transition matrix below. 
+
+```{r CpG_transition_display}
+
+kable(transitions, digits  = 5, caption = "Transition matrix between CpG islands and non-CpG island regions in the human genome. ", align = "c")
+
+```
+
+

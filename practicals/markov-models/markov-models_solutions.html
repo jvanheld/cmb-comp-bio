@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Jacques van Helden" />
+
+<meta name="date" content="2019-12-15" />
+
+<title>Markov Models part 1: nothing to hide so far. Solutions</title>
+
+<script src="markov-models_solutions_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="markov-models_solutions_files/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="markov-models_solutions_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="markov-models_solutions_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="markov-models_solutions_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="markov-models_solutions_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="markov-models_solutions_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="markov-models_solutions_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="markov-models_solutions_files/navigation-1.1/tabsets.js"></script>
+<script src="markov-models_solutions_files/navigation-1.1/codefolding.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Markov Models part 1: nothing to hide so far. Solutions</h1>
+<h3 class="subtitle">Computational biology</h3>
+<h4 class="author">Jacques van Helden</h4>
+<h4 class="date">2019-12-15</h4>
+
+</div>
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">if</span> (<span class="op">!</span><span class="kw">require</span>(<span class="st">&quot;gplots&quot;</span>)) {</span>
+<span id="cb1-2"><a href="#cb1-2"></a>   <span class="kw">install.packages</span>(<span class="st">&quot;gplots&quot;</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a>   <span class="kw">library</span>(gplots)</span>
+<span id="cb1-4"><a href="#cb1-4"></a>   }</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="cf">if</span> (<span class="op">!</span><span class="kw">require</span>(<span class="st">&quot;RColorBrewer&quot;</span>)) {</span>
+<span id="cb1-6"><a href="#cb1-6"></a>   <span class="kw">install.packages</span>(<span class="st">&quot;RColorBrewer&quot;</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb1-7"><a href="#cb1-7"></a>   <span class="kw">library</span>(RColorBrewer)</span>
+<span id="cb1-8"><a href="#cb1-8"></a>   }</span></code></pre></div>
+<div id="cpg-island-length-distribution" class="section level2">
+<h2>CpG island length distribution</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">## Load CpG island coordinates</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>CpG.coord &lt;-<span class="st"> </span><span class="kw">read.delim</span>(<span class="dt">file =</span> <span class="st">&quot;results/hg38/hg38_CpG_islands.bed.gz&quot;</span>, <span class="dt">header =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="kw">names</span>(CpG.coord) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;chr&quot;</span>, <span class="st">&quot;start&quot;</span>, <span class="st">&quot;end&quot;</span>, <span class="st">&quot;id&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">## Note: bed convention : the end marks the first position</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">## **after** the feature, so the length is simply the difference</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>CpG.coord<span class="op">$</span>length &lt;-<span class="st"> </span>CpG.coord<span class="op">$</span>end <span class="op">-</span><span class="st"> </span>CpG.coord<span class="op">$</span>start</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>genome.size &lt;-<span class="st">  </span><span class="fl">3e+9</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">## Compute statistics about CpG island lengths</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>CpG.length.stat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="dt">nb =</span> <span class="kw">nrow</span>(CpG.coord),</span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="dt">min =</span> <span class="kw">min</span>(CpG.coord<span class="op">$</span>length),</span>
+<span id="cb3-7"><a href="#cb3-7"></a>  <span class="dt">Q1 =</span> <span class="kw">quantile</span>(CpG.coord<span class="op">$</span>length, <span class="dt">probs =</span> <span class="fl">0.25</span>),</span>
+<span id="cb3-8"><a href="#cb3-8"></a>  <span class="dt">median =</span> <span class="kw">median</span>(CpG.coord<span class="op">$</span>length),</span>
+<span id="cb3-9"><a href="#cb3-9"></a>  <span class="dt">mean =</span> <span class="kw">mean</span>(CpG.coord<span class="op">$</span>length),</span>
+<span id="cb3-10"><a href="#cb3-10"></a>  <span class="dt">Q3 =</span> <span class="kw">quantile</span>(CpG.coord<span class="op">$</span>length, <span class="dt">probs =</span> <span class="fl">0.75</span>),</span>
+<span id="cb3-11"><a href="#cb3-11"></a>  <span class="dt">pc95 =</span> <span class="kw">quantile</span>(CpG.coord<span class="op">$</span>length, <span class="dt">probs =</span> <span class="fl">0.95</span>),</span>
+<span id="cb3-12"><a href="#cb3-12"></a>  <span class="dt">max =</span> <span class="kw">max</span>(CpG.coord<span class="op">$</span>length),</span>
+<span id="cb3-13"><a href="#cb3-13"></a>  <span class="dt">MB =</span>  <span class="kw">sum</span>(CpG.coord<span class="op">$</span>length) <span class="op">/</span><span class="st"> </span><span class="fl">1e6</span>,</span>
+<span id="cb3-14"><a href="#cb3-14"></a>  <span class="dt">cov.percent =</span> <span class="kw">sum</span>(CpG.coord<span class="op">$</span>length) <span class="op">/</span><span class="st"> </span>genome.size <span class="op">*</span><span class="st"> </span><span class="dv">100</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a>)</span>
+<span id="cb3-16"><a href="#cb3-16"></a></span>
+<span id="cb3-17"><a href="#cb3-17"></a></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">## Print the stats</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="kw">kable</span>(CpG.length.stat, <span class="dt">caption =</span> <span class="st">&quot;Statistics about CpG island lengths&quot;</span>, <span class="dt">digits =</span> <span class="dv">3</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<table>
+<caption>Statistics about CpG island lengths</caption>
+<thead>
+<tr class="header">
+<th align="right">nb</th>
+<th align="right">min</th>
+<th align="right">Q1</th>
+<th align="right">median</th>
+<th align="right">mean</th>
+<th align="right">Q3</th>
+<th align="right">pc95</th>
+<th align="right">max</th>
+<th align="right">MB</th>
+<th align="right">cov.percent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">31144</td>
+<td align="right">201</td>
+<td align="right">325</td>
+<td align="right">569</td>
+<td align="right">777.05</td>
+<td align="right">959</td>
+<td align="right">1947</td>
+<td align="right">45712</td>
+<td align="right">24.2</td>
+<td align="right">0.807</td>
+</tr>
+</tbody>
+</table>
+<p>The currently annotated CpG islands cover 24.2 Mb, which represent 0.8% of the genome.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="fl">4.1</span>, <span class="fl">5.1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">hist</span>(CpG.coord<span class="op">$</span>length, </span>
+<span id="cb4-7"><a href="#cb4-7"></a>     <span class="dt">breaks =</span> <span class="kw">seq</span>(<span class="dt">from =</span> <span class="dv">0</span>, </span>
+<span id="cb4-8"><a href="#cb4-8"></a>                  <span class="dt">to =</span> CpG.length.stat<span class="op">$</span>max <span class="op">+</span><span class="st"> </span><span class="dv">50</span>, </span>
+<span id="cb4-9"><a href="#cb4-9"></a>                  <span class="dt">by =</span> <span class="dv">50</span>),</span>
+<span id="cb4-10"><a href="#cb4-10"></a>     <span class="dt">main =</span> <span class="ot">NA</span>, <span class="dt">las =</span> <span class="dv">1</span>,</span>
+<span id="cb4-11"><a href="#cb4-11"></a>     <span class="dt">xlab =</span> <span class="st">&quot;CpG length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Number of CpGs&quot;</span>)</span>
+<span id="cb4-12"><a href="#cb4-12"></a></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">## Draw the histogram with a limited X axis to see the relevant part of the distribution</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="kw">hist</span>(CpG.coord<span class="op">$</span>length, </span>
+<span id="cb4-15"><a href="#cb4-15"></a>     <span class="dt">breaks =</span> <span class="kw">seq</span>(<span class="dt">from =</span> <span class="dv">0</span>, </span>
+<span id="cb4-16"><a href="#cb4-16"></a>                  <span class="dt">to =</span> CpG.length.stat<span class="op">$</span>max <span class="op">+</span><span class="st"> </span><span class="dv">50</span>, </span>
+<span id="cb4-17"><a href="#cb4-17"></a>                  <span class="dt">by =</span> <span class="dv">50</span>),</span>
+<span id="cb4-18"><a href="#cb4-18"></a>     <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">3000</span>),</span>
+<span id="cb4-19"><a href="#cb4-19"></a>     <span class="dt">main =</span> <span class="ot">NA</span>, <span class="dt">las =</span> <span class="dv">1</span>,</span>
+<span id="cb4-20"><a href="#cb4-20"></a>     <span class="dt">xlab =</span> <span class="st">&quot;CpG length (truncated X scale)&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Number of CpGs&quot;</span>, <span class="dt">col =</span> <span class="st">&quot;gray&quot;</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="figures/markov-models_CpG_lengths-1.png" alt="Distribution of lengths for all the CpG islands annotated in the Human genome." width="80%" />
+<p class="caption">
+Distribution of lengths for all the CpG islands annotated in the Human genome.
+</p>
+</div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="fl">4.1</span>, <span class="fl">5.1</span>, <span class="fl">4.1</span>, <span class="fl">2.1</span>))</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span></code></pre></div>
+</div>
+<div id="loading-the-markov-models" class="section level2">
+<h2>Loading the Markov models</h2>
+<p>We start by loading the two Markov models previously computed from the <a href="http://metazoa.rsat.eu/">RSAT</a> tool <a href="http://rsat.sb-roscoff.fr/create-background-model_form.cgi">create background model</a>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">## Load a transition matrix from the RSAT result</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>readMarkovModel &lt;-<span class="st"> </span><span class="cf">function</span>(file) {</span>
+<span id="cb6-3"><a href="#cb6-3"></a>  model &lt;-<span class="st"> </span><span class="kw">read.delim</span>(</span>
+<span id="cb6-4"><a href="#cb6-4"></a>    <span class="dt">file =</span> file, </span>
+<span id="cb6-5"><a href="#cb6-5"></a>    <span class="dt">row.names =</span> <span class="dv">1</span>)</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  <span class="kw">names</span>(model) &lt;-<span class="st"> </span><span class="kw">toupper</span>(<span class="kw">names</span>(model))</span>
+<span id="cb6-7"><a href="#cb6-7"></a>  <span class="kw">rownames</span>(model) &lt;-<span class="st"> </span><span class="kw">toupper</span>(<span class="kw">rownames</span>(model))</span>
+<span id="cb6-8"><a href="#cb6-8"></a>  prior &lt;-<span class="st"> </span>model[<span class="kw">nrow</span>(model),<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>] <span class="co">## Last row contains priors as comments</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>  <span class="kw">names</span>(prior) &lt;-<span class="st"> </span><span class="kw">names</span>(model)[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</span>
+<span id="cb6-10"><a href="#cb6-10"></a>  transitions &lt;-<span class="st"> </span><span class="kw">rbind</span>(model[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>], <span class="st">&quot;B&quot;</span> =<span class="st"> </span>prior)</span>
+<span id="cb6-11"><a href="#cb6-11"></a>  <span class="kw">return</span>(transitions)</span>
+<span id="cb6-12"><a href="#cb6-12"></a>}</span>
+<span id="cb6-13"><a href="#cb6-13"></a></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">## Load the CpG transition table from the RSAT result</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a>transitions.CpG &lt;-<span class="st"> </span><span class="kw">readMarkovModel</span>(<span class="dt">file =</span> <span class="st">&quot;results/hg38/hg38_CpG_transitions_m1.tsv&quot;</span>)</span>
+<span id="cb6-16"><a href="#cb6-16"></a></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">## Load the genomic background transition table from the RSAT result</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a>transitions.Bg &lt;-<span class="st"> </span><span class="kw">readMarkovModel</span>(<span class="dt">file =</span> <span class="st">&quot;results/hg38/hg38_genomic-bg_transitions_m1.tsv&quot;</span>)</span>
+<span id="cb6-19"><a href="#cb6-19"></a></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">## Check that the rows of the transition matrix sum to 1</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">## (given some rounding errors)</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co"># apply(transitions.CpG[2:5], 1, sum)</span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co"># apply(transitions.Bg[2:5], 1, sum)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">## Define a function that draws a heatmap from a transition matrix</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>transition.heatmap &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb7-3"><a href="#cb7-3"></a>  transitions, </span>
+<span id="cb7-4"><a href="#cb7-4"></a>  <span class="dt">main =</span> <span class="st">&quot;Transitions&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5"></a>  <span class="dt">col.palette =</span> <span class="kw">gray.colors</span>(<span class="dt">n =</span> <span class="dv">100</span>, <span class="dt">start =</span> <span class="dv">1</span>, <span class="dt">end =</span> <span class="dv">0</span>),</span>
+<span id="cb7-6"><a href="#cb7-6"></a>  <span class="dt">breaks =</span> (<span class="dv">0</span><span class="op">:</span><span class="kw">length</span>(col.palette))<span class="op">/</span>(n.colors<span class="op">*</span><span class="dv">2</span>)) {</span>
+<span id="cb7-7"><a href="#cb7-7"></a>  </span>
+<span id="cb7-8"><a href="#cb7-8"></a></span>
+<span id="cb7-9"><a href="#cb7-9"></a>  n.colors &lt;-<span class="st"> </span><span class="kw">length</span>(col.palette)  </span>
+<span id="cb7-10"><a href="#cb7-10"></a>  h &lt;-<span class="st"> </span><span class="kw">heatmap.2</span>(</span>
+<span id="cb7-11"><a href="#cb7-11"></a>    <span class="kw">as.matrix</span>(transitions), </span>
+<span id="cb7-12"><a href="#cb7-12"></a>    <span class="dt">main =</span> main,</span>
+<span id="cb7-13"><a href="#cb7-13"></a>    <span class="dt">cellnote =</span> <span class="kw">round</span>(<span class="dt">digits =</span> <span class="dv">3</span>, <span class="kw">as.matrix</span>(transitions)),</span>
+<span id="cb7-14"><a href="#cb7-14"></a>    <span class="dt">trace =</span> <span class="st">&quot;none&quot;</span>, </span>
+<span id="cb7-15"><a href="#cb7-15"></a>    <span class="dt">margins =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>),</span>
+<span id="cb7-16"><a href="#cb7-16"></a>    <span class="co">#    offsetRow = -10,</span></span>
+<span id="cb7-17"><a href="#cb7-17"></a>    <span class="dt">breaks =</span> breaks, </span>
+<span id="cb7-18"><a href="#cb7-18"></a>    <span class="dt">key =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb7-19"><a href="#cb7-19"></a>    <span class="dt">srtCol =</span> <span class="dv">0</span>,</span>
+<span id="cb7-20"><a href="#cb7-20"></a>    <span class="dt">notecol =</span> <span class="st">&quot;black&quot;</span>, </span>
+<span id="cb7-21"><a href="#cb7-21"></a>    <span class="dt">notecex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb7-22"><a href="#cb7-22"></a>    <span class="dt">col =</span> col.palette,</span>
+<span id="cb7-23"><a href="#cb7-23"></a>    <span class="dt">scale =</span> <span class="st">&quot;none&quot;</span>, </span>
+<span id="cb7-24"><a href="#cb7-24"></a>    <span class="dt">las =</span> <span class="dv">1</span>, </span>
+<span id="cb7-25"><a href="#cb7-25"></a>    <span class="dt">Rowv =</span> <span class="ot">FALSE</span>, <span class="dt">Colv =</span> <span class="ot">FALSE</span>, <span class="dt">dendrogram =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb7-26"><a href="#cb7-26"></a>  <span class="kw">return</span>(h)</span>
+<span id="cb7-27"><a href="#cb7-27"></a>  <span class="co">#  grab_grob()</span></span>
+<span id="cb7-28"><a href="#cb7-28"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">## Draw transition heatmap</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>heatmap.CpG &lt;-<span class="st"> </span><span class="kw">transition.heatmap</span>(transitions.CpG, <span class="st">&quot;CpG islands&quot;</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="figures/markov-models_transition_heatmap_CpG-1.png" alt="Heatmap of the transition matrices from 1st order Markov models trained on CpG islands." width="100%" />
+<p class="caption">
+Heatmap of the transition matrices from 1st order Markov models trained on CpG islands.
+</p>
+</div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">## Draw transition heatmap</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>heatmap.Bg &lt;-<span class="st"> </span><span class="kw">transition.heatmap</span>(transitions.Bg, <span class="st">&quot;Genomic background&quot;</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="figures/markov-models_transition_heatmap_Bg-1.png" alt="Heatmap of the transition matrices from 1st order Markov models trained on genomic background." width="100%" />
+<p class="caption">
+Heatmap of the transition matrices from 1st order Markov models trained on genomic background.
+</p>
+</div>
+</div>
+<div id="discrimination-between-two-models" class="section level2">
+<h2>Discrimination between two models</h2>
+<p>Problem: for a given sequence of events (e.g. a nucleotidic sequence), identify the most likely Markov model.</p>
+<p>Approach: compute the log-likelihood ratios (log-odd ratios) of the sequence probabilities computed using respectively the CpG island and genomic background models.</p>
+<p><span class="math display">\[P_{\text{CpG}}(S) = P_{\text{CpG}}(S_1) \cdot \prod_{i=1}^{n-1} P_{\text{CpG}}(S_{i+1}|S_i)\]</span> <span class="math display">\[P_{\text{Bg}}(S) = P_{\text{Bg}}(S_1) \cdot \prod_{i=1}^{n-1} P_{\text{Bg}}(S_{i+1}|S_i)\]</span></p>
+<p><span class="math display">\[L(S) = log \left( \frac{ P_{\text{CpG}}(S)}{P_{\text{Bg}}(S)} \right)\]</span></p>
+<p>where</p>
+<ul>
+<li><span class="math inline">\(L(S)\)</span> is the log-likelihood of the sequence <span class="math inline">\(S\)</span>,</li>
+<li><span class="math inline">\(P_{\text{CpG}}(S)\)</span> the probability for this sequence to be generated by the CpG island model, and</li>
+<li><span class="math inline">\(P_{\text{Bg}}(S)\)</span> its probability to be generated by the background model.</li>
+</ul>
+<p>A more efficient approach : rather than computing the two sequence probabilities (as the product of transition probabilities), we can compute once and forever a matrix with tbe log-odds of residue transitions.</p>
+<p><span class="math display">\[L(r_j|r_i) = log \left( \frac{P_{\text{CpG}}(r_j|r_i)}{P_{\text{Bg}}(r_j|r_i)} \right)\]</span></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>my.palette &lt;-<span class="st"> </span><span class="kw">colorRampPalette</span>(<span class="kw">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;red&quot;</span>))(<span class="dt">n =</span> <span class="dv">100</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">## Compute log-odds of transition frequencies</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>transition.log.odds &lt;-<span class="st"> </span><span class="kw">log2</span>(transitions.CpG <span class="op">/</span><span class="st"> </span>transitions.Bg)</span>
+<span id="cb10-5"><a href="#cb10-5"></a></span>
+<span id="cb10-6"><a href="#cb10-6"></a>max.lor &lt;-<span class="st"> </span><span class="kw">ceiling</span>(<span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">range</span>(transition.log.odds))))</span>
+<span id="cb10-7"><a href="#cb10-7"></a></span>
+<span id="cb10-8"><a href="#cb10-8"></a>heatmap.logodds &lt;-<span class="st"> </span><span class="kw">transition.heatmap</span>(</span>
+<span id="cb10-9"><a href="#cb10-9"></a>  transition.log.odds, <span class="st">&quot;CpG / Bg log-odds&quot;</span>,</span>
+<span id="cb10-10"><a href="#cb10-10"></a>  <span class="dt">col.palette =</span> my.palette,</span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co">#  breaks = seq(from = -max.lor, to = +max.lor, length.out = length(my.palette) + 1)</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a>  <span class="dt">breaks =</span> <span class="kw">length</span>(my.palette) <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb10-13"><a href="#cb10-13"></a>)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="figures/markov-models_transition_log_odds-1.png" alt="Heatmap of the log-odds between CpG and genomic background." width="100%" />
+<p class="caption">
+Heatmap of the log-odds between CpG and genomic background.
+</p>
+</div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># library(gridGraphics)</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="co"># library(grid)</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co"># library(gplots)</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co"># library(gridExtra)</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="co"># </span></span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="co"># grab_grob &lt;- function(){</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#   grid.echo()</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#   grid.grab()</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co"># }</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co"># heatmaps &lt;- list(</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co">#   CpG = one.heatmap(transitions.CpG, &quot;CpG islands&quot;),</span></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="co">#   Bg = one.heatmap(transitions.Bg, &quot;Genomic background&quot;)</span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="co"># )</span></span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="co"># grid.newpage()</span></span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="co"># grid.arrange(grobs = heatmaps, ncol = 2, clip = TRUE)</span></span></code></pre></div>
+<p>We can then use this log-odds matrix to compute the log-odds of a sequence as the sum of the transition log-odds.</p>
+<p><span class="math display">\[L(S) = L_{\text{B}}(S_1) \cdot \sum_{i=1}^{n-1} L(S_{i+1}|S_i)\]</span></p>
+</div>
+<div id="hidden-markov-model" class="section level2">
+<h2>Hidden Markov Model</h2>
+<p>We already dispose of the emission probabilities of the residues in the two respective states (CpG islands and genomic background). We now need to compute the transition probabilities between the states.</p>
+<p>We can estimate these probabilities based on the following parameters</p>
+<ul>
+<li>genome size: <span class="math inline">\(S_{Bg} = 3\times 10^{9}\)</span></li>
+<li>total size of the annotated CpG islands: <span class="math inline">\(S_{CpG} = 24,200,434\)</span></li>
+<li>number of CpG islands: <span class="math inline">\(N_{CpG} = 31,144\)</span></li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">## Estimate transition matrix for CpG islands</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a>stats &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">L.G =</span> <span class="fl">3e+9</span>, <span class="co">## Genome size</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>                <span class="dt">L.CpG =</span> <span class="dv">24200434</span>, <span class="co"># Total size of CpG islands (label: +)</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a>                <span class="dt">nb.CpG =</span> <span class="dv">31144</span> <span class="co"># Number of CpG islands</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>)</span>
+<span id="cb12-7"><a href="#cb12-7"></a>stats<span class="op">$</span>L.non.CpG &lt;-<span class="st"> </span>stats<span class="op">$</span>L.G <span class="op">-</span><span class="st"> </span>stats<span class="op">$</span>L.CpG <span class="co"># Total size of non-CpG Islands (label: -)</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a>stats<span class="op">$</span>CpG.mean.length &lt;-<span class="st"> </span>stats<span class="op">$</span>L.CpG <span class="op">/</span><span class="st"> </span>stats<span class="op">$</span>nb.CpG</span>
+<span id="cb12-9"><a href="#cb12-9"></a></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="kw">library</span>(knitr)</span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="kw">library</span>(pander)</span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="kw">pander</span>(<span class="kw">as.data.frame</span>(stats), </span>
+<span id="cb12-13"><a href="#cb12-13"></a>       <span class="dt">caption =</span> <span class="st">&quot;Parameters used to compute the CpG island transition matrix.&quot;</span>, </span>
+<span id="cb12-14"><a href="#cb12-14"></a>       <span class="dt">big.mark =</span> <span class="st">&quot;,&quot;</span>)</span></code></pre></div>
+<table style="width:83%;">
+<caption>Parameters used to compute the CpG island transition matrix.</caption>
+<colgroup>
+<col width="11%" />
+<col width="18%" />
+<col width="12%" />
+<col width="16%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">L.G</th>
+<th align="center">L.CpG</th>
+<th align="center">nb.CpG</th>
+<th align="center">L.non.CpG</th>
+<th align="center">CpG.mean.length</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">3e+09</td>
+<td align="center">24,200,434</td>
+<td align="center">31,144</td>
+<td align="center">2.976e+09</td>
+<td align="center">777</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">## Estimate transition matrix for CpG islands</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3"></a>stats &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">L.G =</span> <span class="fl">3e+9</span>, <span class="co">## Genome size</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>                <span class="dt">L.CpG =</span> <span class="dv">24200434</span>, <span class="co"># Total size of CpG islands (label: +)</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>                <span class="dt">nb.CpG =</span> <span class="dv">31144</span> <span class="co"># Number of CpG islands</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>)</span>
+<span id="cb13-7"><a href="#cb13-7"></a>stats<span class="op">$</span>L.non.CpG &lt;-<span class="st"> </span>stats<span class="op">$</span>L.G <span class="op">-</span><span class="st"> </span>stats<span class="op">$</span>L.CpG <span class="co"># Total size of non-CpG Islands (label: -)</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a>stats<span class="op">$</span>CpG.mean.length &lt;-<span class="st"> </span>stats<span class="op">$</span>L.CpG <span class="op">/</span><span class="st"> </span>stats<span class="op">$</span>nb.CpG</span>
+<span id="cb13-9"><a href="#cb13-9"></a></span>
+<span id="cb13-10"><a href="#cb13-10"></a></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="co">## Transition matrix</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a>transitions &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="dt">nrow =</span> <span class="dv">2</span>, <span class="dt">ncol =</span> <span class="dv">2</span>))</span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="kw">names</span>(transitions) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;+&quot;</span>, <span class="st">&quot;-&quot;</span>)</span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="kw">rownames</span>(transitions) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;+&quot;</span>, <span class="st">&quot;-&quot;</span>)</span>
+<span id="cb13-15"><a href="#cb13-15"></a></span>
+<span id="cb13-16"><a href="#cb13-16"></a><span class="co">## Transitions from non-CpG to CpG.</span></span>
+<span id="cb13-17"><a href="#cb13-17"></a><span class="co">## This is the number of switches from non-CpG to CpG island (the number of nucleotide preceding a CpG islands)</span></span>
+<span id="cb13-18"><a href="#cb13-18"></a><span class="co">## divided by the total length of non-CPG islands</span></span>
+<span id="cb13-19"><a href="#cb13-19"></a>transitions[<span class="st">&quot;-&quot;</span>, <span class="st">&quot;+&quot;</span>] &lt;-<span class="st"> </span>stats<span class="op">$</span>nb.CpG <span class="op">/</span><span class="st"> </span>stats<span class="op">$</span>L.non.CpG</span>
+<span id="cb13-20"><a href="#cb13-20"></a><span class="co">## The only other possible transition from &quot;-&quot; is to &quot;-&quot; so the sum is 1 (complementary events)</span></span>
+<span id="cb13-21"><a href="#cb13-21"></a>transitions[<span class="st">&quot;-&quot;</span>, <span class="st">&quot;-&quot;</span>] &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>transitions[<span class="st">&quot;-&quot;</span>, <span class="st">&quot;+&quot;</span>]</span>
+<span id="cb13-22"><a href="#cb13-22"></a></span>
+<span id="cb13-23"><a href="#cb13-23"></a><span class="co">## Transitions from CpG to non-CpG</span></span>
+<span id="cb13-24"><a href="#cb13-24"></a><span class="co">## Same reasoning: the number of ending CpG positions divided by the total length of CpGs</span></span>
+<span id="cb13-25"><a href="#cb13-25"></a>transitions[<span class="st">&quot;+&quot;</span>, <span class="st">&quot;-&quot;</span>] &lt;-<span class="st"> </span>stats<span class="op">$</span>nb.CpG <span class="op">/</span><span class="st"> </span>stats<span class="op">$</span>L.CpG</span>
+<span id="cb13-26"><a href="#cb13-26"></a><span class="co">## The only other possible transition from &quot;+&quot; is to &quot;+&quot; so the sum is 1 (complementary events)</span></span>
+<span id="cb13-27"><a href="#cb13-27"></a>transitions[<span class="st">&quot;+&quot;</span>, <span class="st">&quot;+&quot;</span>] &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span>transitions[<span class="st">&quot;+&quot;</span>, <span class="st">&quot;-&quot;</span>]</span></code></pre></div>
+<p>For convenience, we will use the labels <span class="math inline">\(+\)</span> and <span class="math inline">\(-\)</span> to denote the CpG islands and non-CpG island regions, respectively.</p>
+<p>We can compute the probability of switching from a non-CpG islands to a CpG island with the following reasoning.</p>
+<ul>
+<li>The total size of non-CpG islands is the difference between genome size (3e+09) and the total size of the CpG islands (24,200,434).</li>
+</ul>
+<p><span class="math display">\[S_{-}  = S_{bg} - S_{+} = 3e+09 - 24,200,434 = 2,975,799,566\]</span></p>
+<ul>
+<li>In total, there are <span class="math inline">\(31,144\)</span> CpG islands in the genome, and each of them is preceded by a non-CpG island region. There are thus <span class="math inline">\(31,144\)</span> transitions from non-CpG to CpG. The probability of transition from non-CpG to CpG is thus the number of non-CpG positions preceding a CpG divided by the total number of non-CpG positions.</li>
+</ul>
+<p><span class="math display">\[P(+|-) = N_+ / S_- = \frac{31,144}{2,975,799,566} = 1.0466e-05\]</span></p>
+<ul>
+<li>Since there are only two possible states, the transition probability from non-CpG to non-CpG is the complement of the transition probability from non-CpG to CpG.</li>
+</ul>
+<p><span class="math display">\[P(-|-) = 1 - P(+|-) = 0.99999\]</span></p>
+<p>The same reasoning applies to compute the transition probabilities from CpG islands.</p>
+<ul>
+<li>Each CpG island has an exactly one ending nucleotide, which precedes a non-CpG island nucleotide. The number of nucleotides marking a transition from CpG to non-CpG is thus <span class="math inline">\(31,144\)</span>. The probability of transition from CpG to non-CpG is this number divided by the total size of all CpGs.</li>
+</ul>
+<p><span class="math display">\[P(-|+) = N_+ / S_+ = \frac{31,144}{24,200,434} = 0.00129\]</span></p>
+<ul>
+<li>The probability of transition from CpG to CpG is the complement.</li>
+</ul>
+<p><span class="math display">\[P(+|+) = 1 - P(-|+) = 0.99871\]</span></p>
+<p>The results are summarised in the transition matrix below.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">kable</span>(transitions, <span class="dt">digits  =</span> <span class="dv">5</span>, <span class="dt">caption =</span> <span class="st">&quot;Transition matrix between CpG islands and non-CpG island regions in the human genome. &quot;</span>, <span class="dt">align =</span> <span class="st">&quot;c&quot;</span>)</span></code></pre></div>
+<table>
+<caption>Transition matrix between CpG islands and non-CpG island regions in the human genome.</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th align="center">+</th>
+<th align="center">-</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>+</td>
+<td align="center">0.99871</td>
+<td align="center">0.00129</td>
+</tr>
+<tr class="even">
+<td>-</td>
+<td align="center">0.00001</td>
+<td align="center">0.99999</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
