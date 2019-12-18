@@ -41,7 +41,7 @@ Note: The first course (sequence similarity search) partly overlaps with the int
 | | | Sequence search by similarity      | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.03.similarity_searches_slides.pdf)] |
 | | | Collecting sequence families with BLAST | Practical  | [[html](practicals/blast_proteome/blast_protein-family.html)][[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/blast_proteome/blast_protein-family.Rmd)] |
 | 3 | 2019-11-29 | **Segmenting sequences with HMMs** |
-| | | Hidden Markov Models (HMMs)             | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.05.Hidden-Markov-Models.pdf)]  |
+| | | Hidden Markov Models (HMMs)             | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.05.Hidden-Markov-Models.pdf)] [[Recording](https://amupod.univ-amu.fr/video/3301-applications-of-hidden-markov-models-to-annotate-biological-sequences/)] (requires AMU login) |
 | |  | Analysing CpG islands with Markov models        | Practical  | [[html](practicals/markov-models/markov-models.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models.Rmd)] |
 | 4 | 2019-12-11 |  Analysing CpG islands with Markov models | Solutions (beginning)| [[html](practicals/markov-models/markov-models_solutions.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models_solutions.Rmd)] |
 |  | | Home work: detecting CpG islands in genomic sequences |  | |
