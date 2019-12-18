@@ -43,7 +43,9 @@ Note: The first course (sequence similarity search) partly overlaps with the int
 | 3 | 2019-11-29 | **Segmenting sequences with HMMs** |
 | | | Hidden Markov Models (HMMs)             | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.05.Hidden-Markov-Models.pdf)]  |
 | |  | Analysing CpG islands with Markov models        | Practical  | [[html](practicals/markov-models/markov-models.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models.Rmd)] |
-| 4 | 2019-12-11 |  Analysing CpG islands with Markov models | Solutions  | [[html](practicals/markov-models/markov-models_solutions.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models_solutions.Rmd)] |
+| 4 | 2019-12-11 |  Analysing CpG islands with Markov models | Solutions (beginning)| [[html](practicals/markov-models/markov-models_solutions.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models_solutions.Rmd)] |
+|  | | Home work: detecting CpG islands in genomic sequences |  | |
+
 
 <!--
 | 4 | 2019-12-11 | **Detecting protein domains with HMMs** |
