@@ -30,24 +30,27 @@ Note: The first course (sequence similarity search) partly overlaps with the int
 2. The practical will also introduce the way to run the analyses on a computer cluster (IFB core cluster), by sending them to a job scheduler (slurm). 
 
 | Session | Date | Topics | Type | Teaching material |
-|-----|--------|----------------------------------|-------------|------------------------|
+|---|----------|----------------------------------|--------|------------|
 | 1 | 2019-11-25 | ¨**Using the IFB NNCR cluster infrastructure** |
 | | | Introduction                            | Course     | Slides [[html](slides/01_NNCR-working-environment.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/slides/01_NNCR-working-environment.Rmd)] |
 | | | IFB high performance computing usage | Practical | Slides [[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html)] |
 | | | First steps with the IFB HPC cluster | Practical | - [IFB cluster doc](https://ifb-elixirfr.gitlab.io/cluster/doc/)<br>- [Quick start](https://ifb-elixirfr.gitlab.io/cluster/doc/quick-start/) <br>- [Slurm user guide](https://ifb-elixirfr.gitlab.io/cluster/doc/slurm_user_guide/) |
 | 2  | 2019-11-25 | **Collecting sequence families by sequence alignement**      |
+| | | Background concepts for sequence analysis | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.00.concepts.pdf)] |
 | | | Pairwise sequence alignments      | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.02.pairwise_alignment_slides.pdf)] |
 | | | Sequence search by similarity      | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.03.similarity_searches_slides.pdf)] |
 | | | Collecting sequence families with BLAST | Practical  | [[html](practicals/blast_proteome/blast_protein-family.html)][[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/blast_proteome/blast_protein-family.Rmd)] |
 | 3 | 2019-11-29 | **Segmenting sequences with HMMs** |
 | | | Hidden Markov Models (HMMs)             | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.05.Hidden-Markov-Models.pdf)]  |
 | |  | Analysing CpG islands with Markov models        | Practical  | [[html](practicals/markov-models/markov-models.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models.Rmd)] |
-| 2 | 2019-12-11 |  Analysing CpG islands with Markov models | Solutions  | [[html](practicals/markov-models/markov-models_solutions.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models_solutions.Rmd)] |
+| 4 | 2019-12-11 |  Analysing CpG islands with Markov models | Solutions  | [[html](practicals/markov-models/markov-models_solutions.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models_solutions.Rmd)] |
+
+<!--
 | 4 | 2019-12-11 | **Detecting protein domains with HMMs** |
 | | | Protein domains                         | Course     |  |
 | | | Multiple sequence alignments and sequence motifs | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.04.multiple_alignments_slides.pdf)] |
 | | | Detecting protein domains with HMMs     | Practical  |  |
-
+-->
 
 ## IFB computing infrastructure
 
