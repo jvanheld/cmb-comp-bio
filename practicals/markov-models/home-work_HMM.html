@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Jacques van Helden" />
+
+<meta name="date" content="2019-12-19" />
+
+<title>Computational biology – Home work</title>
+
+<script src="home-work_HMM_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="home-work_HMM_files/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="home-work_HMM_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="home-work_HMM_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="home-work_HMM_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="home-work_HMM_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="home-work_HMM_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="home-work_HMM_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="home-work_HMM_files/navigation-1.1/tabsets.js"></script>
+<script src="home-work_HMM_files/navigation-1.1/codefolding.js"></script>
+
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Computational biology – Home work</h1>
+<h3 class="subtitle">Master Computational and Mathematical Biology</h3>
+<h4 class="author">Jacques van Helden</h4>
+<h4 class="date">2019-12-19</h4>
+
+</div>
+
+
+<div id="home-work" class="section level2">
+<h2>Home work</h2>
+<p>During the practicals we retrieved different sequence sets.</p>
+<ul>
+<li><strong>A: CpG islands</strong></li>
+<li><strong>B: Random genome fragments</strong> of the same sizes as the CpG islands</li>
+<li><strong>C: extended CpG islands</strong> by adding 400 base pairs on each side of the CpG islands annotated in UCSC</li>
+</ul>
+<p>We derived from this data</p>
+<ul>
+<li>an emission probability matrix whose parameters were estimated from the CpG islands</li>
+<li>an emission probability matrix whose parameters were estimated from the genomic background</li>
+<li>a transition probability matrix</li>
+</ul>
+<p>In the following exercise, we will assume that the random genomic sequences contained a marginal proportion of CpG islands, and that we can thus use the emission probabilities of the genomic background as approximation for non-CpG islands.</p>
+<p>We also <em>temporarily</em> assume that the UCSC annotations are perfect (i.e. they cover all the CpG islands and no other sequence). This assumption might however be reevaluated when interpreting the results, because annotations are never perfect.</p>
+<p>The software implementation can be done in the language of your choice, but we expect to obtain a properly documented code that can run on another computer.</p>
+<p>Choose <strong>one</strong> of the following problems. Each topics can be treated by a pair of students (ideally one biologist + one student from math/physics).</p>
+<div id="problem-1-discrimination" class="section level3">
+<h3>Problem 1: discrimination</h3>
+<ol style="list-style-type: decimal">
+<li><p>Implement a program that computes the probability of each sequence given the CpG model, the genomic background, and assign a log-likelihood ratio score to each sequence of the datasets A and B.</p></li>
+<li><p>Draw figures to depict the distribution of LLR scores in the respective sequence sets.</p></li>
+<li><p>Compute the sensitivity (<span class="math inline">\(Sn\)</span>), the False Positive Rate (<span class="math inline">\(FPR\)</span>) and the positive predictive value (<span class="math inline">\(PPV\)</span>) that would be obtained by assigning each sequence to the CpG group if it has a positive LLR, and to the other group otherwise.</p></li>
+<li><p>Compute the same statistics if you would set the threshold to different values covering the range of observed LLR (you can even do so for all the observed values). Draw a curve with the <span class="math inline">\(Sn\)</span> as a function of the <span class="math inline">\(FPR\)</span> (ROC curve).</p></li>
+<li><p>Develop your interpretation of the results (statistical performances, biological relevance, recommendations).</p></li>
+</ol>
+</div>
+<div id="problem-2-segmentation" class="section level3">
+<h3>Problem 2: segmentation</h3>
+<ol style="list-style-type: decimal">
+<li><p>Write a program that implements the Viterbi algorithm.</p></li>
+<li><p>Use it to annotate the CpG islands in the dataset C.</p></li>
+<li><p>Compare the annotations obtained with your Viterbi algorithm and those of the UCSC database, with a confusion matrix where</p>
+<ul>
+<li>the columns correspond the reference sequence types (CpG or flanks in the UCSC annotations),</li>
+<li>the rows correspond to the predicted sequence types (annotated by your Vitterbi algorithm),</li>
+<li>the cells indicate the number of residues of each reference type assigned to each sequence type.</li>
+</ul></li>
+<li><p>From this confusion matrix, derive the following statistics: sensitivity (<span class="math inline">\(Sn\)</span>), False Positive Rate (<span class="math inline">\(FPR\)</span>) and Positive Predictive Value (<span class="math inline">\(PPV\)</span>).</p></li>
+<li><p>Develop your interpretation of the results (statistical performances, biological relevance, recommendations).</p></li>
+</ol>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

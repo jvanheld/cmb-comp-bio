@@ -30,7 +30,7 @@ Note: The first course (sequence similarity search) partly overlaps with the int
 2. The practical will also introduce the way to run the analyses on a computer cluster (IFB core cluster), by sending them to a job scheduler (slurm). 
 
 | Session | Date | Topics | Type | Teaching material |
-|---|----------|----------------------------------|--------|------------|
+|---|----------|----------------------------------|--------|------------------|
 | 1 | 2019-11-25 | ¨**Using the IFB NNCR cluster infrastructure** |
 | | | Introduction                            | Course     | Slides [[html](slides/01_NNCR-working-environment.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/slides/01_NNCR-working-environment.Rmd)] |
 | | | IFB high performance computing usage | Practical | Slides [[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/ebai2019.html)] |
@@ -44,7 +44,7 @@ Note: The first course (sequence similarity search) partly overlaps with the int
 | | | Hidden Markov Models (HMMs)             | Course     | [[Slides](http://pedagogix-tagc.univ-mrs.fr/courses/bioinfo_intro/pdf_files/03.05.Hidden-Markov-Models.pdf)] [[Recording](https://amupod.univ-amu.fr/video/3301-applications-of-hidden-markov-models-to-annotate-biological-sequences/)] (requires AMU login) |
 | |  | Analysing CpG islands with Markov models        | Practical  | [[html](practicals/markov-models/markov-models.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models.Rmd)] |
 | 4 | 2019-12-11 |  Analysing CpG islands with Markov models | Solutions (beginning)| [[html](practicals/markov-models/markov-models_solutions.html)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/markov-models_solutions.Rmd)] |
-|  | | Home work: detecting CpG islands in genomic sequences |  | |
+|  | | Home work: detecting CpG islands in genomic sequences |  | [[html](practicals/markov-models/home-work_HMM.html)] [[pdf](practicals/markov-models/home-work_HMM.pdf)] [[Rmd](https://raw.githubusercontent.com/jvanheld/cmb-comp-bio/master/practicals/markov-models/home-work_HMM.Rmd)] |
 
 
 <!--
