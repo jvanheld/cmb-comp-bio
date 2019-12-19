@@ -4,11 +4,15 @@ subtitle: "Master Computational and Mathematical Biology"
 author: "Jacques van Helden"
 date: '2019-12-19'
 output:
-  pdf_document:
+  html_document:
+    self_contained: false
+    code_folding: hide
     fig_caption: yes
     highlight: zenburn
+    theme: cerulean
     toc: yes
     toc_depth: 3
+    toc_float: yes
   beamer_presentation:
     colortheme: dolphin
     fig_caption: yes
@@ -33,15 +37,11 @@ output:
     theme: cerulean
     toc: yes
     widescreen: yes
-  html_document:
-    self_contained: false
-    code_folding: hide
+  pdf_document:
     fig_caption: yes
     highlight: zenburn
-    theme: cerulean
     toc: yes
     toc_depth: 3
-    toc_float: yes
   ioslides_presentation:
     self_contained: false
     css: slides.css
@@ -103,7 +103,7 @@ We also *temporarily* assume that the UCSC annotations are perfect (i.e. they co
 
 The software implementation can be done in the language of your choice, but we expect to obtain a properly documented code that can run on another computer.
 
-Choose **one** of the following problems. Each topics can be treated by a pair of students (ideally one biologist + one student from math/physics). 
+Choose **one** of the following problems. Each topic can be treated by a pair of students (ideally one biologist + one student from math/physics). 
 
 ### Problem 1: discrimination
 
